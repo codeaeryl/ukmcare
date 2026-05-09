@@ -26,7 +26,7 @@ class MedicalRecord extends Model
 
     public function doctor()
     {
-        return $this->belongsTo(Doctor::class, 'doctor_id', 'doctor_id');
+        return $this->belongsTo(Doctor::class);
     }
 
     public function prescriptions()

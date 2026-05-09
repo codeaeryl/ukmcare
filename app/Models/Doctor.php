@@ -7,12 +7,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Doctor extends Model
 {
-    protected $primaryKey = 'doctor_id';
+    protected $keyType = 'string';
+    public $incrementing = false;
     public $incrementing = false;
     protected $keyType = 'string';
 
     protected $fillable = [
-        'doctor_id',
+        'id',
         'nik',
         'sip',
         'str',
@@ -36,11 +37,11 @@ class Doctor extends Model
 
     public function schedules()
     {
-        return $this->hasMany(Schedule::class, 'doctor_id', 'doctor_id');
+        return $this->hasMany(Schedule::class);
     }
 
     public function medicalRecords()
     {
-        return $this->hasMany(MedicalRecord::class, 'doctor_id', 'doctor_id');
+        return $this->hasMany(MedicalRecord::class);
     }
 }

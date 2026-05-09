@@ -18,7 +18,7 @@ class RegistrationSeeder extends Seeder
 
         if ($patient && $schedule) {
             Registration::create([
-                'patient_mrn' => $patient->mrn,
+                'patient_id' => $patient->id,
                 'schedule_id' => $schedule->id,
                 'queue_number' => 1,
                 'status' => RegistrationStatus::COMPLETED,

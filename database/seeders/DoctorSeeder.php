@@ -21,7 +21,7 @@ class DoctorSeeder extends Seeder
 
         foreach ($users as $index => $user) {
             Doctor::create([
-                'doctor_id' => 'DOC-' . str_pad($index + 1, 4, '0', STR_PAD_LEFT),
+                'id' => 'DOC-' . str_pad($index + 1, 4, '0', STR_PAD_LEFT),
                 'nik' => '32011' . str_pad($index + 1, 11, '0', STR_PAD_LEFT),
                 'sip' => 'SIP/2026/00' . ($index + 1),
                 'str' => 'STR/2026/00' . ($index + 1),

@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('registration_id')->constrained('registrations')->onDelete('cascade');
             $table->string('doctor_id', 20);
-            $table->foreign('doctor_id')->references('doctor_id')->on('doctors')->onDelete('cascade');
+            $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
             $table->string('diagnosis')->nullable();
             $table->text('description')->nullable();
             $table->text('action')->nullable();

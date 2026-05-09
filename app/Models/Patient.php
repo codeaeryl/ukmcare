@@ -8,12 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Patient extends Model
 {
-    protected $primaryKey = 'mrn';
+    protected $keyType = 'string';
+    public $incrementing = false;
     public $incrementing = false;
     protected $keyType = 'string';
 
     protected $fillable = [
-        'mrn',
+        'id',
         'nik',
         'full_name',
         'pob',
@@ -38,6 +39,6 @@ class Patient extends Model
 
     public function registrations()
     {
-        return $this->hasMany(Registration::class, 'patient_mrn', 'mrn');
+        return $this->hasMany(Registration::class);
     }
 }

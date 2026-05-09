@@ -12,8 +12,8 @@ return new class extends Migration
     {
         Schema::create('registrations', function (Blueprint $table) {
             $table->id();
-            $table->string('patient_mrn', 20);
-            $table->foreign('patient_mrn')->references('mrn')->on('patients')->onDelete('cascade');
+            $table->string('patient_id', 20);
+            $table->foreign('patient_id')->references('id')->on('patients')->onDelete('cascade');
             $table->foreignId('schedule_id')->constrained('schedules')->onDelete('cascade');
             $table->integer('queue_number');
             $table->enum('status', array_column(RegistrationStatus::cases(), 'value'));

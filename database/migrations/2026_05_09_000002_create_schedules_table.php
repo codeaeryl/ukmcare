@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('schedules', function (Blueprint $table) {
             $table->id();
             $table->string('doctor_id', 20);
-            $table->foreign('doctor_id')->references('doctor_id')->on('doctors')->onDelete('cascade');
+            $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
             $table->string('schedule_day');
             $table->time('start_hour');
             $table->time('end_hour');

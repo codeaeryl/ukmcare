@@ -23,7 +23,7 @@ class PatientSeeder extends Seeder
 
         foreach ($users as $index => $user) {
             Patient::create([
-                'mrn' => 'MRN-2026' . str_pad($index + 1, 4, '0', STR_PAD_LEFT),
+                'id' => 'MRN-2026' . str_pad($index + 1, 4, '0', STR_PAD_LEFT),
                 'nik' => '32010' . str_pad($index + 1, 11, '0', STR_PAD_LEFT),
                 'full_name' => $user->name,
                 'pob' => 'Jakarta',

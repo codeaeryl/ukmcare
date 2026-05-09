@@ -9,7 +9,7 @@ use App\Enums\RegistrationStatus;
 class Registration extends Model
 {
     protected $fillable = [
-        'patient_mrn',
+        'patient_id',
         'schedule_id',
         'queue_number',
         'status',
@@ -23,7 +23,7 @@ class Registration extends Model
 
     public function patient()
     {
-        return $this->belongsTo(Patient::class, 'patient_mrn', 'mrn');
+        return $this->belongsTo(Patient::class);
     }
 
     public function schedule()

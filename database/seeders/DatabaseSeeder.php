@@ -15,6 +15,18 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             PatientSeeder::class,
             DoctorSeeder::class,
+            ScheduleSeeder::class,
+            MedicineSeeder::class,
+            RegistrationSeeder::class,
+            MedicalRecordSeeder::class,
+            PrescriptionSeeder::class,
+            BillSeeder::class,
+            ServiceSeeder::class,
+            BillServiceSeeder::class,
+            BillMedicineSeeder::class,
+            PaymentSeeder::class,
+            LogSeeder::class,
+            NotificationSeeder::class,
         ]);
     }
 }

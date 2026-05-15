@@ -25,7 +25,7 @@
              class="fixed inset-0 bg-black/50 z-40 lg:hidden">
         </div>
 
-        @if (!request()->routeIs('login') && !request()->routeIs('register'))
+        @if (!request()->routeIs('login') && !request()->routeIs('register') && !request()->routeIs('profile.edit'))
             @include('layouts.sidebar')
         @endif
 

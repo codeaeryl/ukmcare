@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Patient;
+use App\Models\Doctor;
+use App\Models\Registration;
+use App\Models\Payment;
+use App\Models\Log;
 
 class DashboardController extends Controller
 {
@@ -12,13 +17,13 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         if ($user->role->value === 'admin') {
-            $totalPatients = \App\Models\Patient::count();
-            $totalDoctors = \App\Models\Doctor::count();
-            $totalAppointments = \App\Models\Registration::count();
-            $totalRevenue = \App\Models\Payment::sum('paid_amount');
+            $totalPatients = Patient::count();
+            $totalDoctors = Doctor::count();
+            $totalAppointments = Registration::count();
+            $totalRevenue = Payment::sum('paid_amount');
 
-            $recentActivities = \App\Models\Log::with('user')->latest()->take(5)->get();
-            $upcomingVisits = \App\Models\Registration::with('patient', 'schedule.doctor')
+            $recentActivities = Log::with('user')->latest()->take(5)->get();
+            $upcomingVisits = Registration::with('patient', 'schedule.doctor')
                 ->where('status', 'registered')
                 ->whereDate('registration_date', '>=', now())
                 ->orderBy('registration_date', 'asc')

@@ -20,10 +20,15 @@
 
                 <div class="relative" x-data="{ accountDropdownOpen: false }">
                     <button @click="accountDropdownOpen = !accountDropdownOpen" @click.away="accountDropdownOpen = false" class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-md">
-                        <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center">
-                            <i data-lucide="user" class="w-4 h-4"></i>
+                        @php
+                            $nameParts = explode(' ', Auth::user()->name ?? 'User');
+                            $initials = strtoupper(substr($nameParts[0], 0, 1) . (isset($nameParts[1]) ? substr($nameParts[1], 0, 1) : ''));
+                            $firstName = $nameParts[0];
+                        @endphp
+                        <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">
+                            {{ $initials }}
                         </div>
-                        <span class="hidden sm:block text-sm font-medium">Account</span>
+                        <span class="hidden sm:block text-sm font-medium">{{ $firstName }} ({{ $initials }})</span>
                         <i data-lucide="chevron-down" class="hidden sm:block w-4 h-4"></i>
                     </button>
 

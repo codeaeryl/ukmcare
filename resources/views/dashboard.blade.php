@@ -8,10 +8,17 @@
             </h2>
             <p class="text-sm text-gray-500">Overview of today's hospital activities.</p>
         </div>
+        @if(auth()->user()->role->value === 'admin')
+        <a href="{{ route('admin.users.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-colors">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            New User
+        </a>
+        @else
         <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-colors">
             <i data-lucide="plus" class="w-4 h-4"></i>
             New Patient
         </button>
+        @endif
     </div>
 
     <!-- Stats Grid -->

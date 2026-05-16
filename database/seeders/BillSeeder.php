@@ -12,13 +12,13 @@ class BillSeeder extends Seeder
 {
     public function run(): void
     {
-        $registration = Registration::first();
+        $registrations = Registration::all();
 
-        if ($registration) {
+        foreach ($registrations as $registration) {
             Bill::create([
                 'registration_id' => $registration->id,
-                'date' => Carbon::now(),
-                'status' => BillStatus::PENDING,
+                'date' => clone $registration->registration_date, // copy date
+                'status' => collect(BillStatus::cases())->random(),
             ]);
         }
     }

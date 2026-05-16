@@ -24,8 +24,8 @@ class UserSeeder extends Seeder
 
         // Doctors
         $doctors = [
-            ['name' => 'Dr. Alice Smith', 'email' => 'alice.smith@ukmcare.com'],
-            ['name' => 'Dr. Bob Jones', 'email' => 'bob.jones@ukmcare.com'],
+            ['name' => 'Alice Smith', 'email' => 'alice.smith@ukmcare.com'],
+            ['name' => 'Bob Jones', 'email' => 'bob.jones@ukmcare.com'],
         ];
 
         foreach ($doctors as $doctor) {

@@ -25,7 +25,7 @@
              class="fixed inset-0 bg-black/50 z-40 lg:hidden">
         </div>
 
-        @if (!request()->routeIs('login') && !request()->routeIs('register'))
+        @if (!request()->routeIs('login') && !request()->routeIs('register') && !request()->routeIs('profile.edit'))
             @include('layouts.sidebar')
         @endif
 
@@ -49,6 +49,28 @@
     <!-- Initialize Lucide Icons -->
     <script>
       lucide.createIcons();
+    </script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: "{{ session('success') }}",
+                confirmButtonColor: '#2563eb',
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: "{{ session('error') }}",
+                confirmButtonColor: '#2563eb',
+            });
+        @endif
     </script>
 </body>
 </html>

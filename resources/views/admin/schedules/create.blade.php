@@ -1,0 +1,58 @@
+@extends('layouts.master')
+
+@section('content')
+<div class="mb-6">
+    <a href="{{ route('admin.schedules.index') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 mb-2">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        Back to Schedules
+    </a>
+    <h2 class="text-2xl font-semibold text-gray-800">Add New Schedule</h2>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-2xl">
+    <form action="{{ route('admin.schedules.store') }}" method="POST" class="space-y-4">
+        @csrf
+        
+        <div>
+            <label for="doctor_id" class="block text-sm font-medium text-gray-700 mb-1">Doctor</label>
+            <select name="doctor_id" id="doctor_id" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" required>
+                <option value="">Select Doctor</option>
+                @foreach($doctors as $doctor)
+                    <option value="{{ $doctor->id }}">{{ $doctor->full_name }} ({{ $doctor->specialist }})</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div>
+            <label for="schedule_day" class="block text-sm font-medium text-gray-700 mb-1">Day</label>
+            <select name="schedule_day" id="schedule_day" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" required>
+                @foreach(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as $day)
+                    <option value="{{ $day }}">{{ $day }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label for="start_hour" class="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                <input type="time" name="start_hour" id="start_hour" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" required>
+            </div>
+            <div>
+                <label for="end_hour" class="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+                <input type="time" name="end_hour" id="end_hour" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" required>
+            </div>
+        </div>
+
+        <div>
+            <label for="quota" class="block text-sm font-medium text-gray-700 mb-1">Patient Quota</label>
+            <input type="number" name="quota" id="quota" value="20" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" required>
+        </div>
+
+        <div class="pt-4 flex gap-3">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors">
+                Save Schedule
+            </button>
+        </div>
+    </form>
+</div>
+@endsection

@@ -13,17 +13,24 @@ class RegistrationSeeder extends Seeder
 {
     public function run(): void
     {
-        $patient = Patient::first();
-        $schedule = Schedule::first();
+        $patients = Patient::all();
+        $schedules = Schedule::all()->groupBy('doctor_id')->take(2);
 
-        if ($patient && $schedule) {
-            Registration::create([
-                'patient_id' => $patient->id,
-                'schedule_id' => $schedule->id,
-                'queue_number' => 1,
-                'status' => RegistrationStatus::COMPLETED,
-                'registration_date' => Carbon::today(),
-            ]);
+        if ($patients->isEmpty() || $schedules->isEmpty()) {
+            return;
+        }
+
+        foreach ($patients as $patient) {
+            foreach ($schedules as $doctorId => $doctorSchedules) {
+                $schedule = $doctorSchedules->first();
+                Registration::create([
+                    'patient_id' => $patient->id,
+                    'schedule_id' => $schedule->id,
+                    'queue_number' => rand(1, 20),
+                    'status' => RegistrationStatus::COMPLETED,
+                    'registration_date' => Carbon::today()->subDays(rand(1, 10)),
+                ]);
+            }
         }
     }
 }

@@ -78,11 +78,11 @@
                 <i data-lucide="calendar" class="w-5 h-5 flex-shrink-0"></i>
                 <span x-show="sidebarOpen" class="whitespace-nowrap font-medium">My Appointments</span>
             </a>
-            <a href="{{ url('/records') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm hover:bg-gray-100 {{ request()->is('records*') ? 'bg-blue-600 text-white hover:bg-blue-700 hover:text-white shadow-md' : 'text-gray-700' }}">
+            <a href="{{ route('patient.records.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm hover:bg-gray-100 {{ request()->routeIs('patient.records.*') ? 'bg-blue-600 text-white hover:bg-blue-700 hover:text-white shadow-md' : 'text-gray-700' }}">
                 <i data-lucide="file-text" class="w-5 h-5 flex-shrink-0"></i>
                 <span x-show="sidebarOpen" class="whitespace-nowrap font-medium">Medical Records</span>
             </a>
-            <a href="{{ url('/billing') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm hover:bg-gray-100 {{ request()->is('billing*') ? 'bg-blue-600 text-white hover:bg-blue-700 hover:text-white shadow-md' : 'text-gray-700' }}">
+            <a href="{{ route('patient.bills.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm hover:bg-gray-100 {{ request()->routeIs('patient.bills.*') ? 'bg-blue-600 text-white hover:bg-blue-700 hover:text-white shadow-md' : 'text-gray-700' }}">
                 <i data-lucide="receipt" class="w-5 h-5 flex-shrink-0"></i>
                 <span x-show="sidebarOpen" class="whitespace-nowrap font-medium">My Bills</span>
             </a>

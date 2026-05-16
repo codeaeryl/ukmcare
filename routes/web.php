@@ -8,6 +8,8 @@ use App\Http\Controllers\Admin\MedicineController;
 use App\Http\Controllers\Admin\BillController;
 use App\Http\Controllers\Admin\LogController;
 use App\Http\Controllers\Patient\AppointmentController;
+use App\Http\Controllers\Patient\MedicalRecordController as PatientMedicalRecordController;
+use App\Http\Controllers\Patient\BillController as PatientBillController;
 use App\Http\Controllers\Doctor\MedicalRecordController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +38,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 Route::middleware(['auth', 'role:patient'])->prefix('patient')->name('patient.')->group(function () {
     Route::resource('appointments', AppointmentController::class);
     Route::post('appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])->name('appointments.cancel');
+
+    Route::get('records', [PatientMedicalRecordController::class, 'index'])->name('records.index');
+    Route::get('records/{record}', [PatientMedicalRecordController::class, 'show'])->name('records.show');
+
+    Route::get('bills', [PatientBillController::class, 'index'])->name('bills.index');
+    Route::get('bills/{bill}', [PatientBillController::class, 'show'])->name('bills.show');
 });
 
 Route::middleware(['auth', 'role:doctor'])->prefix('doctor')->name('doctor.')->group(function () {

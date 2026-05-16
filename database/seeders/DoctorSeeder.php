@@ -25,7 +25,7 @@ class DoctorSeeder extends Seeder
                 'nik' => '32011' . str_pad($index + 1, 11, '0', STR_PAD_LEFT),
                 'sip' => 'SIP/2026/00' . ($index + 1),
                 'str' => 'STR/2026/00' . ($index + 1),
-                'full_name' => $user->name,
+                'full_name' => 'Dr. ' . $user->name,
                 'specialist' => $specialists[$index % count($specialists)],
                 'phone' => '0812345678' . (9 - $index),
                 'is_bpjs' => ($index % 2 == 0), // Alternates true and false

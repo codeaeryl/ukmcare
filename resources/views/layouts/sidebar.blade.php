@@ -3,24 +3,20 @@
       isMobile ? (sidebarOpen ? 'w-64' : 'w-0') : (sidebarOpen ? 'w-64' : 'w-16'),
       isMobile && !sidebarOpen ? '-translate-x-full' : 'translate-x-0'
     ]">
-    <div class="h-16 px-4 border-b border-gray-200 flex items-center justify-between">
-        <a href="{{ url('/') }}" x-show="sidebarOpen" class="text-sm font-semibold flex items-center gap-2 whitespace-nowrap text-blue-600 hover:text-blue-800 transition-colors">
-            <i data-lucide="activity" class="w-6 h-6" x-show="sidebarOpen"></i>
+    <div class="h-16 px-2 border-b border-gray-200 flex items-center" :class="sidebarOpen ? 'justify-between px-4' : 'justify-center'">
+        <a href="{{ url('/') }}" x-show="sidebarOpen" x-cloak class="text-sm font-semibold flex items-center gap-2 whitespace-nowrap text-blue-600 hover:text-blue-800 transition-colors">
+            <i data-lucide="activity" class="w-6 h-6"></i>
             UKMCare Hospital
         </a>
-        <!-- Tanda icon kecil saat sidebar tertutup -->
-        <a href="{{ url('/') }}" x-show="!sidebarOpen && !isMobile" class="mx-auto text-blue-600 hover:text-blue-800 transition-colors">
-            <i data-lucide="activity" class="w-6 h-6"></i>
-        </a>
 
-        <button @click="sidebarOpen = !sidebarOpen" class="p-2 hover:bg-gray-100 rounded-md hidden lg:block flex-shrink-0" :class="{ 'mx-auto': !sidebarOpen }">
+        <button @click="sidebarOpen = !sidebarOpen" class="p-2 hover:bg-gray-100 rounded-md hidden lg:flex items-center justify-center flex-shrink-0">
             <i data-lucide="chevron-left" x-show="sidebarOpen" class="w-5 h-5 text-gray-500"></i>
             <i data-lucide="chevron-right" x-show="!sidebarOpen" class="w-5 h-5 text-gray-500"></i>
         </button>
     </div>
 
-    <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
-        <p x-show="sidebarOpen" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-2">Main Menu</p>
+    <nav class="flex-1 p-2 space-y-1 overflow-y-auto" :class="sidebarOpen ? 'p-4 space-y-2' : 'p-2 space-y-1'">
+        <p x-show="sidebarOpen" x-cloak class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-2">Main Menu</p>
 
         <!-- General Dashboard -->
         <a href="{{ url('/dashboard') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm hover:bg-gray-100 {{ request()->is('dashboard') ? 'bg-blue-600 text-white hover:bg-blue-700 hover:text-white shadow-md' : 'text-gray-700' }}">

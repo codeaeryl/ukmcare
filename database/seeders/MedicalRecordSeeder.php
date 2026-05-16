@@ -11,16 +11,18 @@ class MedicalRecordSeeder extends Seeder
 {
     public function run(): void
     {
-        $registration = Registration::first();
+        $registrations = Registration::with('schedule')->get();
 
-        if ($registration) {
+        $diagnoses = ['Common Cold', 'Flu', 'Headache', 'Stomach Ache', 'Allergy', 'Fatigue'];
+
+        foreach ($registrations as $registration) {
             MedicalRecord::create([
                 'registration_id' => $registration->id,
                 'doctor_id' => $registration->schedule->doctor_id,
-                'diagnosis' => 'Common Cold',
-                'description' => 'Patient complains of runny nose and mild fever.',
+                'diagnosis' => collect($diagnoses)->random(),
+                'description' => 'Patient complains of mild symptoms related to the diagnosis.',
                 'action' => 'Prescribed rest and medication.',
-                'record_date' => Carbon::now(),
+                'record_date' => $registration->registration_date,
             ]);
         }
     }

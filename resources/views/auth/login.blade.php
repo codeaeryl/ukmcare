@@ -60,6 +60,13 @@
                     {{ __('Log in') }}
                 </button>
             </div>
+
+            <div class="mt-4 text-center">
+                <span class="text-sm text-gray-600">{{ __("Don't have an account?") }}</span>
+                <a class="text-sm text-blue-600 hover:text-blue-800 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-md ml-1" href="{{ route('register') }}">
+                    {{ __('Register here') }}
+                </a>
+            </div>
         </form>
     </div>
     

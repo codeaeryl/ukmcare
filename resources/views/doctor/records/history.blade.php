@@ -13,6 +13,7 @@
                     <th class="px-6 py-3 font-medium">Date</th>
                     <th class="px-6 py-3 font-medium">Patient Name</th>
                     <th class="px-6 py-3 font-medium">Diagnosis</th>
+                    <th class="px-6 py-3 font-medium text-right">Action</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -21,6 +22,11 @@
                         <td class="px-6 py-4">{{ $rec->created_at->format('d M Y') }}</td>
                         <td class="px-6 py-4 font-medium text-gray-800">{{ $rec->registration->patient->full_name }}</td>
                         <td class="px-6 py-4 text-gray-600">{{ $rec->diagnosis }}</td>
+                        <td class="px-6 py-4 flex justify-end">
+                            <a href="{{ route('doctor.records.show', $rec->id) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                View Details
+                            </a>
+                        </td>
                     </tr>
                 @empty
                     <tr>

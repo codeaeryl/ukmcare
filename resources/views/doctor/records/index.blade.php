@@ -27,9 +27,18 @@
                         </td>
                         <td class="px-6 py-4 font-medium text-gray-800">{{ $reg->patient->full_name }}</td>
                         <td class="px-6 py-4 flex justify-end">
-                            <a href="{{ route('doctor.records.create', $reg->id) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-medium transition-colors">
-                                Examine
-                            </a>
+                            @php
+                                $canExamine = $reg->registration_date->startOfDay()->lte(now()->startOfDay());
+                            @endphp
+                            @if($canExamine)
+                                <a href="{{ route('doctor.records.create', $reg->id) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-medium transition-colors">
+                                    Examine
+                                </a>
+                            @else
+                                <span class="bg-gray-200 text-gray-500 px-4 py-2 rounded-lg text-xs font-medium cursor-not-allowed" title="Available on {{ $reg->registration_date->format('d M Y') }}">
+                                    Waiting
+                                </span>
+                            @endif
                         </td>
                     </tr>
                 @empty

@@ -30,6 +30,11 @@ class AppointmentController extends Controller
 
     public function availableSlots(Request $request)
     {
+        $patient = auth()->user()->patient;
+        if (!$patient) {
+            return response()->json(['error' => 'Please complete your patient profile first.'], 403);
+        }
+
         $request->validate([
             'schedule_id' => 'required|exists:schedules,id',
             'date' => 'required|date',
@@ -67,19 +72,28 @@ class AppointmentController extends Controller
 
     public function create()
     {
+        $patient = auth()->user()->patient;
+        if (!$patient) {
+            return redirect()->route('dashboard')->with('error', 'Please complete your patient profile first.');
+        }
+
         $doctors = Doctor::where('is_active', true)->with('schedules')->get();
         return view('patient.appointments.create', compact('doctors'));
     }
 
     public function store(Request $request)
     {
+        $patient = auth()->user()->patient;
+        if (!$patient) {
+            return redirect()->route('dashboard')->with('error', 'Please complete your patient profile first.');
+        }
+
         $request->validate([
             'schedule_id' => 'required|exists:schedules,id',
             'registration_date' => 'required|date|after_or_equal:today',
             'time_slot' => 'required|string',
         ]);
 
-        $patient = auth()->user()->patient;
         $schedule = Schedule::findOrFail($request->schedule_id);
 
         $selectedDay = Carbon::parse($request->registration_date)->format('l');
@@ -139,7 +153,8 @@ class AppointmentController extends Controller
 
     public function cancel(Registration $appointment)
     {
-        if ($appointment->patient_id !== auth()->user()->patient->id) {
+        $patient = auth()->user()->patient;
+        if (!$patient || $appointment->patient_id !== $patient->id) {
             abort(403);
         }
 

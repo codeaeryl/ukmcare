@@ -38,6 +38,11 @@ class MedicalRecordController extends Controller
 
     public function create(Registration $registration)
     {
+        $doctor = auth()->user()->doctor;
+        if (!$doctor || $registration->schedule->doctor_id !== $doctor->id) {
+            abort(403);
+        }
+
         $registration->load('patient');
         $medicines = Medicine::where('stock', '>', 0)->get();
         return view('doctor.records.create', compact('registration', 'medicines'));
@@ -45,6 +50,11 @@ class MedicalRecordController extends Controller
 
     public function store(Request $request, Registration $registration)
     {
+        $doctor = auth()->user()->doctor;
+        if (!$doctor || $registration->schedule->doctor_id !== $doctor->id) {
+            abort(403);
+        }
+
         $request->validate([
             'diagnosis' => 'required|string',
             'treatment' => 'required|string',
@@ -52,6 +62,17 @@ class MedicalRecordController extends Controller
             'medicines.*.id' => 'exists:medicines,id',
             'medicines.*.quantity' => 'integer|min:1',
         ]);
+
+        if ($request->filled('medicines')) {
+            foreach ($request->medicines as $med) {
+                if (isset($med['id']) && isset($med['quantity'])) {
+                    $medicine = Medicine::find($med['id']);
+                    if ($medicine->stock < $med['quantity']) {
+                        return back()->withErrors(['medicines' => "Not enough stock for {$medicine->name}. Available: {$medicine->stock}."])->withInput();
+                    }
+                }
+            }
+        }
 
         DB::transaction(function () use ($request, $registration) {
             $record = MedicalRecord::create([
@@ -79,32 +100,38 @@ class MedicalRecordController extends Controller
                 }
             }
 
-            // Auto-generate Bill
-            $bill = Bill::create([
-                'registration_id' => $registration->id,
-                'date' => now(),
-                'status' => BillStatus::PENDING,
-            ]);
+            // Auto-generate Bill or find existing
+            $bill = Bill::firstOrCreate(
+                ['registration_id' => $registration->id],
+                [
+                    'date' => now(),
+                    'status' => BillStatus::PENDING,
+                ]
+            );
 
             if ($request->filled('medicines')) {
                 foreach ($request->medicines as $med) {
                     if (isset($med['id']) && isset($med['quantity'])) {
                         $medicine = Medicine::find($med['id']);
-                        $bill->billMedicines()->create([
-                            'medicine_id' => $med['id'],
-                            'quantity' => $med['quantity'],
-                            'price' => $medicine->price,
-                        ]);
+                        $bill->billMedicines()->firstOrCreate(
+                            ['medicine_id' => $med['id']],
+                            [
+                                'quantity' => $med['quantity'],
+                                'price' => $medicine->price,
+                            ]
+                        );
                     }
                 }
             }
 
             $service = Service::firstOrCreate(['name' => 'Consultation Fee'], ['price' => 50000]);
-            $bill->billServices()->create([
-                'service_id' => $service->id,
-                'quantity' => 1,
-                'price' => $service->price,
-            ]);
+            $bill->billServices()->firstOrCreate(
+                ['service_id' => $service->id],
+                [
+                    'quantity' => 1,
+                    'price' => $service->price,
+                ]
+            );
 
             $registration->update(['status' => RegistrationStatus::PENDING]);
         });

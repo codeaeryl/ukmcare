@@ -18,19 +18,22 @@
             <label for="schedule_day" class="block text-sm font-medium text-gray-700 mb-1">Day</label>
             <select name="schedule_day" id="schedule_day" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" required>
                 @foreach(DayName::cases() as $day)
-                    <option value="{{ $day->value }}">{{ $day->value }}</option>
+                    <option value="{{ $day->value }}" @selected(old('schedule_day') == $day->value)>{{ $day->value }}</option>
                 @endforeach
             </select>
+            @error('schedule_day') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
 
         <div class="grid grid-cols-2 gap-4">
             <div>
                 <label for="start_hour" class="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
-                <input type="time" name="start_hour" id="start_hour" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" required>
+                <input type="time" name="start_hour" id="start_hour" value="{{ old('start_hour') }}" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" required>
+                @error('start_hour') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
             <div>
                 <label for="end_hour" class="block text-sm font-medium text-gray-700 mb-1">End Time</label>
-                <input type="time" name="end_hour" id="end_hour" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" required>
+                <input type="time" name="end_hour" id="end_hour" value="{{ old('end_hour') }}" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" required>
+                @error('end_hour') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
         </div>
 

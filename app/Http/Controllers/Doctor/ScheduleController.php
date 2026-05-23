@@ -34,6 +34,18 @@ class ScheduleController extends Controller
 
         $doctor = auth()->user()->doctor;
 
+        $overlapExists = Schedule::where('doctor_id', $doctor->id)
+            ->where('schedule_day', $request->schedule_day)
+            ->where(function ($query) use ($request) {
+                $query->where('start_hour', '<', $request->end_hour)
+                      ->where('end_hour', '>', $request->start_hour);
+            })
+            ->exists();
+
+        if ($overlapExists) {
+            return back()->withErrors(['start_hour' => 'The schedule overlaps with one of your existing schedules on the selected day.'])->withInput();
+        }
+
         $start = Carbon::createFromFormat('H:i', $request->start_hour);
         $end = Carbon::createFromFormat('H:i', $request->end_hour);
         $quota = intval($start->diffInMinutes($end) / 20);
@@ -72,6 +84,19 @@ class ScheduleController extends Controller
             'start_hour' => 'required|date_format:H:i',
             'end_hour' => 'required|date_format:H:i|after:start_hour',
         ]);
+
+        $overlapExists = Schedule::where('doctor_id', $schedule->doctor_id)
+            ->where('schedule_day', $request->schedule_day)
+            ->where('id', '!=', $schedule->id)
+            ->where(function ($query) use ($request) {
+                $query->where('start_hour', '<', $request->end_hour)
+                      ->where('end_hour', '>', $request->start_hour);
+            })
+            ->exists();
+
+        if ($overlapExists) {
+            return back()->withErrors(['start_hour' => 'The schedule overlaps with one of your existing schedules on the selected day.'])->withInput();
+        }
 
         $start = Carbon::createFromFormat('H:i', $request->start_hour);
         $end = Carbon::createFromFormat('H:i', $request->end_hour);

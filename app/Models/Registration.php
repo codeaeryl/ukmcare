@@ -14,6 +14,7 @@ class Registration extends Model
         'queue_number',
         'status',
         'registration_date',
+        'time_slot',
     ];
 
     protected $casts = [

@@ -202,7 +202,7 @@
                 <ul class="space-y-3 text-sm text-gray-400">
                     <li class="flex items-start gap-3">
                         <i data-lucide="map-pin" class="w-5 h-5 text-blue-500 shrink-0"></i>
-                        <span>123 Health Avenue, Medical District, Jakarta 12345</span>
+                        <span>Universitas Kristen Maranatha</span>
                     </li>
                     <li class="flex items-center gap-3">
                         <i data-lucide="phone" class="w-5 h-5 text-blue-500 shrink-0"></i>

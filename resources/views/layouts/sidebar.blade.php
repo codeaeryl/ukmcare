@@ -60,6 +60,10 @@
             </a>
         @elseif(auth()->user()->role->value === 'doctor')
             <!-- DOCTOR MENU -->
+            <a href="{{ route('doctor.schedules.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm hover:bg-gray-100 {{ request()->routeIs('doctor.schedules.*') ? 'bg-blue-600 text-white hover:bg-blue-700 hover:text-white shadow-md' : 'text-gray-700' }}">
+                <i data-lucide="calendar" class="w-5 h-5 flex-shrink-0"></i>
+                <span x-show="sidebarOpen" class="whitespace-nowrap font-medium">My Schedules</span>
+            </a>
             <a href="{{ route('doctor.records.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm hover:bg-gray-100 {{ request()->routeIs('doctor.records.*') ? 'bg-blue-600 text-white hover:bg-blue-700 hover:text-white shadow-md' : 'text-gray-700' }}">
                 <i data-lucide="clipboard-list" class="w-5 h-5 flex-shrink-0"></i>
                 <span x-show="sidebarOpen" class="whitespace-nowrap font-medium">Patient Queue</span>

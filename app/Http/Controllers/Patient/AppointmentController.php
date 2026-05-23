@@ -27,6 +27,43 @@ class AppointmentController extends Controller
         return view('patient.appointments.index', compact('appointments'));
     }
 
+    public function availableSlots(Request $request)
+    {
+        $request->validate([
+            'schedule_id' => 'required|exists:schedules,id',
+            'date' => 'required|date',
+        ]);
+
+        $schedule = Schedule::findOrFail($request->schedule_id);
+        $date = $request->date;
+
+        $start = \Carbon\Carbon::parse($schedule->start_hour);
+        $end = \Carbon\Carbon::parse($schedule->end_hour);
+
+        $slots = [];
+        $current = $start->copy();
+
+        while ($current->lt($end)) {
+            $slotStart = $current->format('H:i');
+            $current->addMinutes(20);
+            if ($current->gt($end)) break;
+            $slotEnd = $current->format('H:i');
+            $slots[] = "$slotStart - $slotEnd";
+        }
+
+        $bookedSlots = Registration::where('schedule_id', $schedule->id)
+            ->whereDate('registration_date', $date)
+            ->where('status', '!=', RegistrationStatus::CANCELLED)
+            ->pluck('time_slot')
+            ->toArray();
+
+        $availableSlots = array_values(array_diff($slots, $bookedSlots));
+
+        return response()->json([
+            'available_slots' => $availableSlots
+        ]);
+    }
+
     public function create()
     {
         $doctors = Doctor::where('is_active', true)->with('schedules')->get();
@@ -38,6 +75,7 @@ class AppointmentController extends Controller
         $request->validate([
             'schedule_id' => 'required|exists:schedules,id',
             'registration_date' => 'required|date|after_or_equal:today',
+            'time_slot' => 'required|string',
         ]);
 
         $patient = auth()->user()->patient;
@@ -57,12 +95,40 @@ class AppointmentController extends Controller
             return back()->with('error', 'The quota for this doctor on selected date is full.');
         }
 
-        $queueNumber = $count + 1;
+        // Check if the specific time slot is already booked
+        $isSlotBooked = Registration::where('schedule_id', $schedule->id)
+            ->whereDate('registration_date', $request->registration_date)
+            ->where('time_slot', $request->time_slot)
+            ->where('status', '!=', RegistrationStatus::CANCELLED)
+            ->exists();
+
+        if ($isSlotBooked) {
+            return back()->with('error', 'The selected time slot is already booked. Please choose another one.');
+        }
+
+        $start = \Carbon\Carbon::parse($schedule->start_hour);
+        $end = \Carbon\Carbon::parse($schedule->end_hour);
+        $slots = [];
+        $current = $start->copy();
+        while ($current->lt($end)) {
+            $slotStart = $current->format('H:i');
+            $current->addMinutes(20);
+            if ($current->gt($end)) break;
+            $slotEnd = $current->format('H:i');
+            $slots[] = "$slotStart - $slotEnd";
+        }
+
+        $queueNumber = array_search($request->time_slot, $slots);
+        if ($queueNumber === false) {
+            return back()->with('error', 'Invalid time slot selected.');
+        }
+        $queueNumber += 1;
 
         Registration::create([
             'patient_id' => $patient->id,
             'schedule_id' => $schedule->id,
             'queue_number' => $queueNumber,
+            'time_slot' => $request->time_slot,
             'status' => RegistrationStatus::REGISTERED,
             'registration_date' => $request->registration_date,
         ]);

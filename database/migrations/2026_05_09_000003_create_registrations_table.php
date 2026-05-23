@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreign('patient_id')->references('id')->on('patients')->onDelete('cascade');
             $table->foreignId('schedule_id')->constrained('schedules')->onDelete('cascade');
             $table->integer('queue_number');
+            $table->string('time_slot', 20)->nullable();
             $table->enum('status', array_column(RegistrationStatus::cases(), 'value'));
             $table->date('registration_date');
             $table->timestamps();

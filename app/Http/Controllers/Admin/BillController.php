@@ -23,7 +23,7 @@ class BillController extends Controller
 
     public function create()
     {
-        $registrations = Registration::where('status', RegistrationStatus::COMPLETED)
+        $registrations = Registration::where('status', RegistrationStatus::PENDING)
             ->whereDoesntHave('bill')
             ->with('patient')
             ->get();
@@ -104,6 +104,7 @@ class BillController extends Controller
             ]);
 
             $bill->update(['status' => BillStatus::COMPLETE]);
+            $bill->registration->update(['status' => RegistrationStatus::COMPLETED]);
         });
 
         return redirect()->route('admin.bills.index')->with('success', 'Payment processed successfully.');

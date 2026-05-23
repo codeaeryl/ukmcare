@@ -7,7 +7,10 @@ use App\Models\MedicalRecord;
 use App\Models\Registration;
 use App\Models\Medicine;
 use App\Models\Prescription;
+use App\Models\Bill;
+use App\Models\Service;
 use App\Enums\RegistrationStatus;
+use App\Enums\BillStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -76,7 +79,34 @@ class MedicalRecordController extends Controller
                 }
             }
 
-            $registration->update(['status' => RegistrationStatus::COMPLETED]);
+            // Auto-generate Bill
+            $bill = Bill::create([
+                'registration_id' => $registration->id,
+                'date' => now(),
+                'status' => BillStatus::PENDING,
+            ]);
+
+            if ($request->filled('medicines')) {
+                foreach ($request->medicines as $med) {
+                    if (isset($med['id']) && isset($med['quantity'])) {
+                        $medicine = Medicine::find($med['id']);
+                        $bill->billMedicines()->create([
+                            'medicine_id' => $med['id'],
+                            'quantity' => $med['quantity'],
+                            'price' => $medicine->price,
+                        ]);
+                    }
+                }
+            }
+
+            $service = Service::firstOrCreate(['name' => 'Consultation Fee'], ['price' => 50000]);
+            $bill->billServices()->create([
+                'service_id' => $service->id,
+                'quantity' => 1,
+                'price' => $service->price,
+            ]);
+
+            $registration->update(['status' => RegistrationStatus::PENDING]);
         });
 
         return redirect()->route('doctor.records.index')->with('success', 'Medical record saved successfully.');
@@ -91,5 +121,15 @@ class MedicalRecordController extends Controller
             ->paginate(10);
 
         return view('doctor.records.history', compact('records'));
+    }
+
+    public function show(MedicalRecord $record)
+    {
+        if ($record->doctor_id !== auth()->user()->doctor->id) {
+            abort(403);
+        }
+
+        $record->load(['registration.patient', 'prescriptions.medicine']);
+        return view('doctor.records.show', compact('record'));
     }
 }

@@ -2,7 +2,7 @@
     <div class="px-4 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <div class="flex items-center gap-4">
-                @if(!request()->routeIs('profile.edit'))
+                @if(request()->routeIs('admin.users.*'))
                     <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden p-2 hover:bg-gray-100 rounded-md">
                         <i data-lucide="menu" class="w-5 h-5"></i>
                     </button>
@@ -10,9 +10,13 @@
                     <form class="hidden md:block">
                         <div class="relative">
                             <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4"></i>
-                            <input type="search" placeholder="Search Patients or Doctors..." class="pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 lg:w-96 text-sm" />
+                            <input type="search" placeholder="Search Users..." class="pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-50 w-64 lg:w-96 text-sm" />
                         </div>
                     </form>
+                @else
+                    <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden p-2 hover:bg-gray-100 rounded-md">
+                        <i data-lucide="menu" class="w-5 h-5"></i>
+                    </button>
                 @endif
             </div>
 
@@ -55,12 +59,12 @@
             </div>
         </div>
         
-        @if(!request()->routeIs('profile.edit'))
+        @if(request()->routeIs('admin.users.*'))
         <div class="md:hidden pb-3">
             <form>
                 <div class="relative">
                     <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4"></i>
-                    <input type="search" placeholder="Search..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+                    <input type="search" placeholder="Search Users..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
                 </div>
             </form>
         </div>

@@ -36,6 +36,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 });
 
 Route::middleware(['auth', 'role:patient'])->prefix('patient')->name('patient.')->group(function () {
+    Route::get('appointments/available-slots', [AppointmentController::class, 'availableSlots'])->name('appointments.available-slots');
     Route::resource('appointments', AppointmentController::class);
     Route::post('appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])->name('appointments.cancel');
 
@@ -47,10 +48,12 @@ Route::middleware(['auth', 'role:patient'])->prefix('patient')->name('patient.')
 });
 
 Route::middleware(['auth', 'role:doctor'])->prefix('doctor')->name('doctor.')->group(function () {
+    Route::resource('schedules', App\Http\Controllers\Doctor\ScheduleController::class);
     Route::get('records/history', [MedicalRecordController::class, 'history'])->name('records.history');
     Route::get('records', [MedicalRecordController::class, 'index'])->name('records.index');
     Route::get('records/{registration}/create', [MedicalRecordController::class, 'create'])->name('records.create');
     Route::post('records/{registration}', [MedicalRecordController::class, 'store'])->name('records.store');
+    Route::get('records/{record}/show', [MedicalRecordController::class, 'show'])->name('records.show');
 });
 
 

@@ -39,6 +39,15 @@
                     <label for="registration_date" class="block text-sm font-medium text-gray-700 mb-2">Appointment Date</label>
                     <input type="date" name="registration_date" id="registration_date" min="{{ date('Y-m-d') }}" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" required>
                 </div>
+
+                <div id="time_slots_container" class="hidden mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Time Slot</label>
+                    <div id="time_slots_list" class="grid grid-cols-3 gap-2">
+                        <!-- Slots will be rendered here by JS -->
+                    </div>
+                    <input type="hidden" name="time_slot" id="selected_time_slot" required>
+                </div>
+
                 <div class="pt-4 flex gap-3">
                     <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-sm font-bold shadow-md transition-colors">
                         Confirm Appointment
@@ -48,4 +57,63 @@
         </div>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const scheduleRadios = document.querySelectorAll('input[name="schedule_id"]');
+    const dateInput = document.getElementById('registration_date');
+    const slotsContainer = document.getElementById('time_slots_container');
+    const slotsList = document.getElementById('time_slots_list');
+    const selectedSlotInput = document.getElementById('selected_time_slot');
+
+    function fetchSlots() {
+        const selectedSchedule = document.querySelector('input[name="schedule_id"]:checked');
+        const selectedDate = dateInput.value;
+
+        if (selectedSchedule && selectedDate) {
+            slotsContainer.classList.remove('hidden');
+            slotsList.innerHTML = '<p class="text-gray-500 col-span-3 text-sm">Loading available slots...</p>';
+            selectedSlotInput.value = '';
+
+            fetch(`{{ route('patient.appointments.available-slots') }}?schedule_id=${selectedSchedule.value}&date=${selectedDate}`)
+                .then(response => response.json())
+                .then(data => {
+                    slotsList.innerHTML = '';
+                    if (data.available_slots.length === 0) {
+                        slotsList.innerHTML = '<p class="text-red-500 col-span-3 text-sm">No available slots for this date.</p>';
+                        return;
+                    }
+
+                    data.available_slots.forEach(slot => {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'slot-btn px-3 py-2 border border-blue-200 rounded-lg text-sm text-blue-700 hover:bg-blue-50 transition-colors';
+                        btn.textContent = slot;
+                        btn.onclick = () => selectSlot(btn, slot);
+                        slotsList.appendChild(btn);
+                    });
+                })
+                .catch(err => {
+                    slotsList.innerHTML = '<p class="text-red-500 col-span-3 text-sm">Error loading slots.</p>';
+                });
+        } else {
+            slotsContainer.classList.add('hidden');
+            selectedSlotInput.value = '';
+        }
+    }
+
+    function selectSlot(btn, slot) {
+        document.querySelectorAll('.slot-btn').forEach(b => {
+            b.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+            b.classList.add('text-blue-700', 'hover:bg-blue-50');
+        });
+        btn.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+        btn.classList.remove('text-blue-700', 'hover:bg-blue-50');
+        selectedSlotInput.value = slot;
+    }
+
+    scheduleRadios.forEach(radio => radio.addEventListener('change', fetchSlots));
+    dateInput.addEventListener('change', fetchSlots);
+});
+</script>
 @endsection

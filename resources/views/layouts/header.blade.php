@@ -16,7 +16,43 @@
                 @endif
             </div>
 
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-4">
+                <!-- Notifications -->
+                <div class="relative" x-data="{ notifOpen: false }">
+                    <button @click="notifOpen = !notifOpen" @click.away="notifOpen = false" class="relative p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full transition-colors">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        @php
+                            $unreadCount = \App\Models\Notification::where('user_id', Auth::id())->where('created_at', '>=', now()->subDay())->count();
+                        @endphp
+                        @if($unreadCount > 0)
+                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+                        @endif
+                    </button>
+
+                    <div x-show="notifOpen" style="display: none;" class="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50 overflow-hidden">
+                        <div class="px-4 py-3 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                            <h3 class="text-sm font-semibold text-gray-800">Notifications</h3>
+                            @if($unreadCount > 0)
+                                <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $unreadCount }} New</span>
+                            @endif
+                        </div>
+                        <div class="max-h-96 overflow-y-auto">
+                            @php
+                                $notifications = \App\Models\Notification::where('user_id', Auth::id())->latest()->take(10)->get();
+                            @endphp
+                            @forelse($notifications as $notif)
+                                <div class="px-4 py-3 border-b border-gray-50 hover:bg-gray-50 {{ $notif->created_at >= now()->subDay() ? 'bg-blue-50/50' : '' }}">
+                                    <p class="text-sm text-gray-800">{{ $notif->message }}</p>
+                                    <p class="text-xs text-gray-500 mt-1">{{ $notif->created_at->diffForHumans() }}</p>
+                                </div>
+                            @empty
+                                <div class="px-4 py-6 text-center text-sm text-gray-500">
+                                    No notifications yet.
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
 
                 <div class="relative" x-data="{ accountDropdownOpen: false }">
                     <button @click="accountDropdownOpen = !accountDropdownOpen" @click.away="accountDropdownOpen = false" class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-md">

@@ -31,6 +31,11 @@
                 <span x-show="sidebarOpen" class="whitespace-nowrap font-medium">User Management</span>
             </a>
 
+            <a href="{{ route('admin.bpjs.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm hover:bg-gray-100 {{ request()->routeIs('admin.bpjs.*') ? 'bg-blue-600 text-white hover:bg-blue-700 hover:text-white shadow-md' : 'text-gray-700' }}">
+                <i data-lucide="shield-check" class="w-5 h-5 flex-shrink-0"></i>
+                <span x-show="sidebarOpen" class="whitespace-nowrap font-medium">BPJS Verifications</span>
+            </a>
+
             <a href="{{ url('/doctors') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm hover:bg-gray-100 {{ request()->is('doctors*') ? 'bg-blue-600 text-white hover:bg-blue-700 hover:text-white shadow-md' : 'text-gray-700' }}">
                 <i data-lucide="stethoscope" class="w-5 h-5 flex-shrink-0"></i>
                 <span x-show="sidebarOpen" class="whitespace-nowrap font-medium">Doctors</span>

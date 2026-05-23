@@ -22,6 +22,7 @@ class Patient extends Model
         'phone',
         'blood_type',
         'bpjs_number',
+        'bpjs_status',
         'user_id',
     ];
 

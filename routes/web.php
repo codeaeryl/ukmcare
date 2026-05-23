@@ -22,6 +22,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['au
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('/profile/patient', [ProfileController::class, 'patientUpdate'])->name('profile.patient.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
@@ -33,6 +34,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('bills', BillController::class);
     Route::post('bills/{bill}/pay', [BillController::class, 'pay'])->name('bills.pay');
     Route::get('logs', [LogController::class, 'index'])->name('logs.index');
+    
+    Route::get('bpjs', [\App\Http\Controllers\Admin\BpjsController::class, 'index'])->name('bpjs.index');
+    Route::patch('bpjs/{patient}', [\App\Http\Controllers\Admin\BpjsController::class, 'update'])->name('bpjs.update');
 });
 
 Route::middleware(['auth', 'role:patient'])->prefix('patient')->name('patient.')->group(function () {

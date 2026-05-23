@@ -34,7 +34,15 @@
             <div class="w-px h-10 bg-gray-200 mx-2"></div>
             <div class="text-left">
                 <p class="text-sm text-gray-500">BPJS</p>
-                <p class="font-medium text-gray-800">{{ $patient->bpjs_number ? 'Registered' : 'Not Registered' }}</p>
+                @if($patient->bpjs_status === 'verified')
+                    <p class="font-medium text-green-600"><i data-lucide="check-circle" class="w-4 h-4 inline"></i> Verified</p>
+                @elseif($patient->bpjs_status === 'pending')
+                    <p class="font-medium text-yellow-600"><i data-lucide="clock" class="w-4 h-4 inline"></i> Pending</p>
+                @elseif($patient->bpjs_status === 'rejected')
+                    <p class="font-medium text-red-600"><i data-lucide="x-circle" class="w-4 h-4 inline"></i> Rejected</p>
+                @else
+                    <p class="font-medium text-gray-800">Not Registered</p>
+                @endif
             </div>
         </div>
     </div>
@@ -58,7 +66,7 @@
             <div>
                 <p class="text-sm text-gray-500 font-medium">Next Appointment</p>
                 @if($upcomingAppointment)
-                    <h3 class="text-lg font-bold text-gray-800">{{ $upcomingAppointment->registration_date->format('d M Y, H:i') }}</h3>
+                    <h3 class="text-lg font-bold text-gray-800">{{ $upcomingAppointment->registration_date->format('d M Y') }}, {{ \Carbon\Carbon::parse($upcomingAppointment->schedule->start_hour)->format('H:i') }}</h3>
                     <p class="text-sm text-blue-600">Queue: #{{ $upcomingAppointment->queue_number }}</p>
                 @else
                     <h3 class="text-lg font-bold text-gray-800">No Upcoming Appointments</h3>

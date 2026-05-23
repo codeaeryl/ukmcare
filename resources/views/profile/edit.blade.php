@@ -80,6 +80,85 @@
             </div>
         </div>
 
+        @if (auth()->user()->role->value === 'patient')
+        <!-- Patient Information -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden relative z-0">
+            <div class="p-6 border-b border-gray-100 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                    <i data-lucide="file-text" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-medium text-gray-800">Medical & Verification Info</h3>
+                    <p class="text-sm text-gray-500">Update your blood type and BPJS verification status.</p>
+                </div>
+            </div>
+            <div class="p-6 relative z-10">
+                <form method="post" action="{{ route('profile.patient.update') }}" class="space-y-6 max-w-xl relative z-10">
+                    @csrf
+                    @method('patch')
+                    @php $patient = auth()->user()->patient; @endphp
+
+                    <div>
+                        <label for="blood_type" class="block text-sm font-medium text-gray-700 mb-1">Blood Type</label>
+                        <select id="blood_type" name="blood_type" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="">Select Blood Type</option>
+                            <option value="A" {{ old('blood_type', $patient->blood_type ?? '') == 'A' ? 'selected' : '' }}>A</option>
+                            <option value="B" {{ old('blood_type', $patient->blood_type ?? '') == 'B' ? 'selected' : '' }}>B</option>
+                            <option value="AB" {{ old('blood_type', $patient->blood_type ?? '') == 'AB' ? 'selected' : '' }}>AB</option>
+                            <option value="O" {{ old('blood_type', $patient->blood_type ?? '') == 'O' ? 'selected' : '' }}>O</option>
+                        </select>
+                        @error('blood_type') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label for="bpjs_number" class="block text-sm font-medium text-gray-700 mb-1">BPJS Number</label>
+                        <div class="flex gap-2">
+                            <input id="bpjs_number" name="bpjs_number" type="text" value="{{ old('bpjs_number', $patient->bpjs_number ?? '') }}" {{ ($patient->bpjs_status ?? '') === 'verified' ? 'readonly' : '' }} class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 {{ ($patient->bpjs_status ?? '') === 'verified' ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : '' }}">
+                        </div>
+                        @error('bpjs_number') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+                        
+                        <div class="mt-2">
+                            @if(($patient->bpjs_status ?? 'unverified') === 'unverified')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700">
+                                    <i data-lucide="circle-dashed" class="w-3.5 h-3.5"></i> Unverified
+                                </span>
+                            @elseif($patient->bpjs_status === 'pending')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-yellow-100 text-yellow-700">
+                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i> Pending Admin Verification
+                                </span>
+                                <p class="text-xs text-gray-500 mt-1">Please wait while our admin verifies your BPJS number.</p>
+                            @elseif($patient->bpjs_status === 'verified')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-green-100 text-green-700 border border-green-200">
+                                    <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Verified Active
+                                </span>
+                                <p class="text-xs text-gray-500 mt-1">Your BPJS is verified. Contact admin if you need to change it.</p>
+                            @elseif($patient->bpjs_status === 'rejected')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-red-100 text-red-700">
+                                    <i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Rejected / Invalid
+                                </span>
+                                <p class="text-xs text-red-500 mt-1">Your BPJS number is invalid or inactive. Please update it.</p>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4 pt-4">
+                        @if(($patient->bpjs_status ?? '') !== 'verified')
+                        <button type="submit" class="pointer-events-auto relative z-50 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm transition-colors cursor-pointer">
+                            Save Information
+                        </button>
+                        @endif
+
+                        @if (session('status') === 'patient-updated')
+                            <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)" class="text-sm text-green-600 flex items-center gap-1">
+                                <i data-lucide="check-circle" class="w-4 h-4"></i> Saved.
+                            </p>
+                        @endif
+                    </div>
+                </form>
+            </div>
+        </div>
+        @endif
+
         <!-- Update Password -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden relative z-0">
             <div class="p-6 border-b border-gray-100">

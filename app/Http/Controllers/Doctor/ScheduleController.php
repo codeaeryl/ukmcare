@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Doctor;
 use App\Http\Controllers\Controller;
 use App\Models\Schedule;
 use App\Models\Log;
+use App\Enums\DayName;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Enum;
+use Carbon\Carbon;
 
 class ScheduleController extends Controller
 {
@@ -24,15 +27,15 @@ class ScheduleController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'schedule_day' => 'required|string',
-            'start_hour' => 'required',
-            'end_hour' => 'required',
+            'schedule_day' => ['required', new Enum(DayName::class)],
+            'start_hour' => 'required|date_format:H:i',
+            'end_hour' => 'required|date_format:H:i|after:start_hour',
         ]);
 
         $doctor = auth()->user()->doctor;
 
-        $start = \Carbon\Carbon::parse($request->start_hour);
-        $end = \Carbon\Carbon::parse($request->end_hour);
+        $start = Carbon::createFromFormat('H:i', $request->start_hour);
+        $end = Carbon::createFromFormat('H:i', $request->end_hour);
         $quota = intval($start->diffInMinutes($end) / 20);
 
         $data = $request->all();
@@ -43,7 +46,7 @@ class ScheduleController extends Controller
 
         Log::create([
             'user_id' => auth()->id(),
-            'activity' => 'Added new schedule on ' . $schedule->schedule_day,
+            'activity' => 'Added new schedule on ' . $schedule->schedule_day->value,
             'date' => now(),
         ]);
 
@@ -65,13 +68,13 @@ class ScheduleController extends Controller
         }
 
         $request->validate([
-            'schedule_day' => 'required|string',
-            'start_hour' => 'required',
-            'end_hour' => 'required',
+            'schedule_day' => ['required', new Enum(DayName::class)],
+            'start_hour' => 'required|date_format:H:i',
+            'end_hour' => 'required|date_format:H:i|after:start_hour',
         ]);
 
-        $start = \Carbon\Carbon::parse($request->start_hour);
-        $end = \Carbon\Carbon::parse($request->end_hour);
+        $start = Carbon::createFromFormat('H:i', $request->start_hour);
+        $end = Carbon::createFromFormat('H:i', $request->end_hour);
         $quota = intval($start->diffInMinutes($end) / 20);
 
         $data = $request->all();
@@ -81,7 +84,7 @@ class ScheduleController extends Controller
 
         Log::create([
             'user_id' => auth()->id(),
-            'activity' => 'Updated schedule on ' . $schedule->schedule_day,
+            'activity' => 'Updated schedule on ' . $schedule->schedule_day->value,
             'date' => now(),
         ]);
 
@@ -94,7 +97,7 @@ class ScheduleController extends Controller
             abort(403);
         }
 
-        $day = $schedule->schedule_day;
+        $day = $schedule->schedule_day->value;
         $schedule->delete();
 
         Log::create([

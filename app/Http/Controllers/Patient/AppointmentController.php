@@ -8,6 +8,7 @@ use App\Models\Schedule;
 use App\Models\Doctor;
 use App\Enums\RegistrationStatus;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class AppointmentController extends Controller
 {
@@ -37,8 +38,8 @@ class AppointmentController extends Controller
         $schedule = Schedule::findOrFail($request->schedule_id);
         $date = $request->date;
 
-        $start = \Carbon\Carbon::parse($schedule->start_hour);
-        $end = \Carbon\Carbon::parse($schedule->end_hour);
+        $start = Carbon::parse($schedule->start_hour);
+        $end = Carbon::parse($schedule->end_hour);
 
         $slots = [];
         $current = $start->copy();
@@ -81,9 +82,9 @@ class AppointmentController extends Controller
         $patient = auth()->user()->patient;
         $schedule = Schedule::findOrFail($request->schedule_id);
 
-        $selectedDay = \Carbon\Carbon::parse($request->registration_date)->format('l');
-        if ($selectedDay !== $schedule->schedule_day) {
-            return back()->with('error', "This schedule is for {$schedule->schedule_day}s. You selected a {$selectedDay}. Please choose a date that falls on a {$schedule->schedule_day}.");
+        $selectedDay = Carbon::parse($request->registration_date)->format('l');
+        if (strcasecmp($selectedDay, $schedule->schedule_day->value) !== 0) {
+            return back()->with('error', "This schedule is for {$schedule->schedule_day->value}s. You selected a {$selectedDay}. Please choose a date that falls on a {$schedule->schedule_day->value}.");
         }
 
         $count = Registration::where('schedule_id', $schedule->id)
@@ -106,8 +107,8 @@ class AppointmentController extends Controller
             return back()->with('error', 'The selected time slot is already booked. Please choose another one.');
         }
 
-        $start = \Carbon\Carbon::parse($schedule->start_hour);
-        $end = \Carbon\Carbon::parse($schedule->end_hour);
+        $start = Carbon::parse($schedule->start_hour);
+        $end = Carbon::parse($schedule->end_hour);
         $slots = [];
         $current = $start->copy();
         while ($current->lt($end)) {

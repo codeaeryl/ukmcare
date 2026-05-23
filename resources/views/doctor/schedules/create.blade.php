@@ -1,3 +1,4 @@
+@use('App\Enums\DayName')
 @extends('layouts.master')
 
 @section('content')
@@ -16,8 +17,8 @@
         <div>
             <label for="schedule_day" class="block text-sm font-medium text-gray-700 mb-1">Day</label>
             <select name="schedule_day" id="schedule_day" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" required>
-                @foreach(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as $day)
-                    <option value="{{ $day }}">{{ $day }}</option>
+                @foreach(DayName::cases() as $day)
+                    <option value="{{ $day->value }}">{{ $day->value }}</option>
                 @endforeach
             </select>
         </div>

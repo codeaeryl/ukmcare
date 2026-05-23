@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Enums\DayName;
 
 return new class extends Migration
 {
@@ -12,7 +13,7 @@ return new class extends Migration
             $table->id();
             $table->string('doctor_id', 20);
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
-            $table->string('schedule_day');
+            $table->enum('schedule_day', array_column(DayName::cases(), 'value'));
             $table->time('start_hour');
             $table->time('end_hour');
             $table->integer('quota');

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\Enums\DayName;
+
 class Schedule extends Model
 {
     protected $fillable = [
@@ -12,6 +14,10 @@ class Schedule extends Model
         'start_hour',
         'end_hour',
         'quota',
+    ];
+
+    protected $casts = [
+        'schedule_day' => DayName::class,
     ];
 
     public function doctor()

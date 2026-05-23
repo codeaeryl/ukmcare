@@ -38,7 +38,7 @@ class ScheduleController extends Controller
         $end = Carbon::createFromFormat('H:i', $request->end_hour);
         $quota = intval($start->diffInMinutes($end) / 20);
 
-        $data = $request->all();
+        $data = $request->except('doctor_id');
         $data['doctor_id'] = $doctor->id;
         $data['quota'] = $quota;
 
@@ -77,7 +77,7 @@ class ScheduleController extends Controller
         $end = Carbon::createFromFormat('H:i', $request->end_hour);
         $quota = intval($start->diffInMinutes($end) / 20);
 
-        $data = $request->all();
+        $data = $request->except('doctor_id');
         $data['quota'] = $quota;
 
         $schedule->update($data);
@@ -105,7 +105,7 @@ class ScheduleController extends Controller
             'activity' => 'Deleted schedule on ' . $day,
             'date' => now(),
         ]);
-        
+
         return redirect()->route('doctor.schedules.index')->with('success', 'Schedule deleted successfully.');
     }
 }

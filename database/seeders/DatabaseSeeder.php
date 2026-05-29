@@ -25,7 +25,6 @@ class DatabaseSeeder extends Seeder
             BillServiceSeeder::class,
             BillMedicineSeeder::class,
             PaymentSeeder::class,
-            LogSeeder::class,
             NotificationSeeder::class,
         ]);
     }

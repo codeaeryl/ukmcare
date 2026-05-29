@@ -8,10 +8,6 @@
         </h2>
         <p class="text-sm text-gray-500">Manage your availability for patient appointments.</p>
     </div>
-    <a href="{{ route('doctor.schedules.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-colors">
-        <i data-lucide="plus" class="w-4 h-4"></i>
-        Add Schedule
-    </a>
 </div>
 
 @if (session('success'))
@@ -28,6 +24,7 @@
                     <th class="px-6 py-3 font-medium">Day</th>
                     <th class="px-6 py-3 font-medium">Time</th>
                     <th class="px-6 py-3 font-medium">Quota</th>
+                    <th class="px-6 py-3 font-medium">Status</th>
                     <th class="px-6 py-3 font-medium text-right">Actions</th>
                 </tr>
             </thead>
@@ -37,17 +34,35 @@
                         <td class="px-6 py-4 text-gray-600 font-medium">{{ $schedule->schedule_day }}</td>
                         <td class="px-6 py-4 text-gray-600">{{ $schedule->start_hour }} - {{ $schedule->end_hour }}</td>
                         <td class="px-6 py-4 text-gray-600">{{ $schedule->quota }} patients (20-min slots)</td>
+                        <td class="px-6 py-4">
+                            @if($schedule->status === 'pending')
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full">Pending</span>
+                            @elseif($schedule->status === 'accepted')
+                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">Accepted</span>
+                            @else
+                                <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full">Rejected</span>
+                            @endif
+                        </td>
                         <td class="px-6 py-4 flex justify-end gap-2">
-                            <form action="{{ route('doctor.schedules.destroy', $schedule->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this schedule?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="px-2 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded text-xs font-medium transition-colors">Delete</button>
-                            </form>
+                            @if($schedule->status === 'pending')
+                                <form action="{{ route('doctor.schedules.verify', $schedule->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="status" value="accepted">
+                                    <button type="submit" class="px-2 py-1 bg-green-50 text-green-600 hover:bg-green-100 rounded text-xs font-medium transition-colors">Accept</button>
+                                </form>
+                                <form action="{{ route('doctor.schedules.verify', $schedule->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="status" value="rejected">
+                                    <button type="submit" class="px-2 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded text-xs font-medium transition-colors">Reject</button>
+                                </form>
+                            @endif
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="px-6 py-8 text-center text-gray-500">No schedules found. Click "Add Schedule" to create one.</td>
+                        <td colspan="5" class="px-6 py-8 text-center text-gray-500">No schedules assigned yet.</td>
                     </tr>
                 @endforelse
             </tbody>

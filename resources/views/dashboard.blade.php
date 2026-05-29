@@ -13,11 +13,6 @@
             <i data-lucide="plus" class="w-4 h-4"></i>
             New User
         </a>
-        @else
-        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-colors">
-            <i data-lucide="plus" class="w-4 h-4"></i>
-            New Patient
-        </button>
         @endif
     </div>
 
@@ -65,7 +60,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 gap-6">
         <!-- Upcoming Visits -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
@@ -96,42 +91,6 @@
             </div>
         </div>
 
-        <!-- Recent Logs -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="font-semibold text-gray-800">Recent Activity Logs</h3>
-            </div>
-            <div class="p-6">
-                <div class="flow-root">
-                    <ul class="-mb-8">
-                        @forelse($recentActivities as $log)
-                        <li>
-                            <div class="relative pb-8">
-                                <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
-                                <div class="relative flex space-x-3">
-                                    <div>
-                                        <span class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
-                                            <i data-lucide="user" class="w-4 h-4 text-white"></i>
-                                        </span>
-                                    </div>
-                                    <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
-                                        <div>
-                                            <p class="text-sm text-gray-500">{{ $log->activity }} <span class="font-medium text-gray-900">by {{ $log->user->name }}</span></p>
-                                        </div>
-                                        <div class="whitespace-nowrap text-right text-sm text-gray-500">
-                                            <time>{{ $log->created_at->diffForHumans() }}</time>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        @empty
-                        <li class="text-sm text-gray-400 italic">No activity recorded yet.</li>
-                        @endforelse
-                    </ul>
-                </div>
-            </div>
-        </div>
     </div>
     @elseif(auth()->user()->role->value === 'doctor')
     <div class="bg-blue-50 border border-blue-100 rounded-xl p-8 text-center">

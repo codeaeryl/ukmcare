@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('phone', 15)->nullable();
             $table->string('blood_type', 3)->nullable();
             $table->string('bpjs_number', 20)->unique()->nullable();
+            $table->string('bpjs_status', 20)->default('unverified');
             $table->foreignId('user_id')->unique()->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });

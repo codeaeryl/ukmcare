@@ -25,7 +25,11 @@ class AppointmentController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('patient.appointments.index', compact('appointments'));
+        $hasActiveAppointment = Registration::where('patient_id', $patient->id)
+            ->where('status', RegistrationStatus::REGISTERED)
+            ->exists();
+
+        return view('patient.appointments.index', compact('appointments', 'hasActiveAppointment'));
     }
 
     public function availableSlots(Request $request)
@@ -77,6 +81,14 @@ class AppointmentController extends Controller
             return redirect()->route('dashboard')->with('error', 'Please complete your patient profile first.');
         }
 
+        $hasActiveAppointment = Registration::where('patient_id', $patient->id)
+            ->where('status', RegistrationStatus::REGISTERED)
+            ->exists();
+
+        if ($hasActiveAppointment) {
+            return redirect()->route('patient.appointments.index')->with('error', 'You already have an active appointment registration.');
+        }
+
         $doctors = Doctor::where('is_active', true)->with('schedules')->get();
         return view('patient.appointments.create', compact('doctors'));
     }
@@ -86,6 +98,14 @@ class AppointmentController extends Controller
         $patient = auth()->user()->patient;
         if (!$patient) {
             return redirect()->route('dashboard')->with('error', 'Please complete your patient profile first.');
+        }
+
+        $hasActiveAppointment = Registration::where('patient_id', $patient->id)
+            ->where('status', RegistrationStatus::REGISTERED)
+            ->exists();
+
+        if ($hasActiveAppointment) {
+            return redirect()->route('patient.appointments.index')->with('error', 'You already have an active appointment registration.');
         }
 
         $request->validate([

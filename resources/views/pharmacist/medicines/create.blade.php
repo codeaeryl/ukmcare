@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="mb-6">
-    <a href="{{ route('admin.medicines.index') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 mb-2">
+    <a href="{{ route('pharmacist.medicines.index') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 mb-2">
         <i data-lucide="arrow-left" class="w-4 h-4"></i>
         Back to Inventory
     </a>
@@ -10,7 +10,7 @@
 </div>
 
 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-2xl">
-    <form action="{{ route('admin.medicines.store') }}" method="POST" class="space-y-4">
+    <form action="{{ route('pharmacist.medicines.store') }}" method="POST" class="space-y-4">
         @csrf
         <div>
             <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Medicine Name</label>

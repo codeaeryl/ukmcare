@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Cashier;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bill;
@@ -18,7 +18,7 @@ class BillController extends Controller
     public function index()
     {
         $bills = Bill::with(['registration.patient', 'payment'])->latest()->paginate(10);
-        return view('admin.bills.index', compact('bills'));
+        return view('cashier.bills.index', compact('bills'));
     }
 
     public function create()
@@ -28,7 +28,7 @@ class BillController extends Controller
             ->with('patient')
             ->get();
             
-        return view('admin.bills.create', compact('registrations'));
+        return view('cashier.bills.create', compact('registrations'));
     }
 
     public function store(Request $request)
@@ -64,7 +64,7 @@ class BillController extends Controller
             ]);
         });
 
-        return redirect()->route('admin.bills.index')->with('success', 'Bill generated successfully.');
+        return redirect()->route('cashier.bills.index')->with('success', 'Bill generated successfully.');
     }
 
     public function show(Bill $bill)
@@ -81,7 +81,7 @@ class BillController extends Controller
         
         $grandTotal = $totalMedicines + $totalServices;
 
-        return view('admin.bills.show', compact('bill', 'grandTotal'));
+        return view('cashier.bills.show', compact('bill', 'grandTotal'));
     }
 
     public function pay(Request $request, Bill $bill)
@@ -107,6 +107,6 @@ class BillController extends Controller
             $bill->registration->update(['status' => RegistrationStatus::COMPLETED]);
         });
 
-        return redirect()->route('admin.bills.index')->with('success', 'Payment processed successfully.');
+        return redirect()->route('cashier.bills.index')->with('success', 'Payment processed successfully.');
     }
 }

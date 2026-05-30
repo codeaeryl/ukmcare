@@ -40,18 +40,21 @@
                 <i data-lucide="calendar-check" class="w-5 h-5 flex-shrink-0"></i>
                 <span x-show="sidebarOpen" class="whitespace-nowrap font-medium">Doctor Schedules</span>
             </a>
+        @elseif(auth()->user()->role->value === 'cashier')
+            <!-- CASHIER MENU -->
+            <p x-show="sidebarOpen" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6">Billing</p>
 
-            <p x-show="sidebarOpen" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6">Pharmacy & Billing</p>
-
-
-            <a href="{{ route('admin.medicines.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm hover:bg-gray-100 {{ request()->routeIs('admin.medicines.*') ? 'bg-blue-600 text-white hover:bg-blue-700 hover:text-white shadow-md' : 'text-gray-700' }}">
-                <i data-lucide="pill" class="w-5 h-5 flex-shrink-0"></i>
-                <span x-show="sidebarOpen" class="whitespace-nowrap font-medium">Pharmacy</span>
-            </a>
-
-            <a href="{{ route('admin.bills.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm hover:bg-gray-100 {{ request()->routeIs('admin.bills.*') ? 'bg-blue-600 text-white hover:bg-blue-700 hover:text-white shadow-md' : 'text-gray-700' }}">
+            <a href="{{ route('cashier.bills.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm hover:bg-gray-100 {{ request()->routeIs('cashier.bills.*') ? 'bg-blue-600 text-white hover:bg-blue-700 hover:text-white shadow-md' : 'text-gray-700' }}">
                 <i data-lucide="credit-card" class="w-5 h-5 flex-shrink-0"></i>
-                <span x-show="sidebarOpen" class="whitespace-nowrap font-medium">Billing</span>
+                <span x-show="sidebarOpen" class="whitespace-nowrap font-medium">Billing Management</span>
+            </a>
+        @elseif(auth()->user()->role->value === 'pharmacist')
+            <!-- PHARMACIST MENU -->
+            <p x-show="sidebarOpen" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6">Pharmacy</p>
+
+            <a href="{{ route('pharmacist.medicines.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm hover:bg-gray-100 {{ request()->routeIs('pharmacist.medicines.*') ? 'bg-blue-600 text-white hover:bg-blue-700 hover:text-white shadow-md' : 'text-gray-700' }}">
+                <i data-lucide="pill" class="w-5 h-5 flex-shrink-0"></i>
+                <span x-show="sidebarOpen" class="whitespace-nowrap font-medium">Pharmacy Inventory</span>
             </a>
         @elseif(auth()->user()->role->value === 'doctor')
             <!-- DOCTOR MENU -->

@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="mb-6">
-    <a href="{{ route('admin.bills.index') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 mb-2">
+    <a href="{{ route('cashier.bills.index') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 mb-2">
         <i data-lucide="arrow-left" class="w-4 h-4"></i>
         Back to Bills
     </a>
@@ -10,7 +10,7 @@
 </div>
 
 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-2xl">
-    <form action="{{ route('admin.bills.store') }}" method="POST" class="space-y-4">
+    <form action="{{ route('cashier.bills.store') }}" method="POST" class="space-y-4">
         @csrf
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Select Completed Visit</label>

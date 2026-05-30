@@ -103,5 +103,27 @@
             View Patient Queue
         </a>
     </div>
+    @elseif(auth()->user()->role->value === 'cashier')
+    <div class="bg-blue-50 border border-blue-100 rounded-xl p-8 text-center">
+        <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="credit-card" class="w-8 h-8"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Welcome, {{ auth()->user()->name }}!</h3>
+        <p class="text-gray-600 mb-6">Have a great day at work. Manage hospital billing and process payments here.</p>
+        <a href="{{ route('cashier.bills.index') }}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+            Manage Billing
+        </a>
+    </div>
+    @elseif(auth()->user()->role->value === 'pharmacist')
+    <div class="bg-blue-50 border border-blue-100 rounded-xl p-8 text-center">
+        <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="pill" class="w-8 h-8"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Welcome, {{ auth()->user()->name }}!</h3>
+        <p class="text-gray-600 mb-6">Have a great day at work. Manage medicine inventory and view prescriptions here.</p>
+        <a href="{{ route('pharmacist.medicines.index') }}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+            Manage Pharmacy
+        </a>
+    </div>
     @endif
 @endsection

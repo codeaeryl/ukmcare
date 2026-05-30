@@ -5,7 +5,7 @@
     <div>
         <h2 class="text-2xl font-semibold text-gray-800">Medicine Inventory</h2>
     </div>
-    <a href="{{ route('admin.medicines.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-colors">
+    <a href="{{ route('pharmacist.medicines.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-colors">
         Add Medicine
     </a>
 </div>
@@ -32,7 +32,8 @@
                         </td>
                         <td class="px-6 py-4 text-gray-600">Rp {{ number_format($med->price, 0, ',', '.') }}</td>
                         <td class="px-6 py-4 flex justify-end gap-2">
-                            <form action="{{ route('admin.medicines.destroy', $med->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this medicine?');">
+                            <a href="{{ route('pharmacist.medicines.edit', $med->id) }}" class="px-2 py-1 bg-yellow-50 text-yellow-600 hover:bg-yellow-100 rounded text-xs font-medium transition-colors">Edit</a>
+                            <form action="{{ route('pharmacist.medicines.destroy', $med->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this medicine?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="px-2 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded text-xs font-medium transition-colors">Delete</button>

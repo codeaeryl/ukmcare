@@ -4,8 +4,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ScheduleController;
-use App\Http\Controllers\Admin\MedicineController;
-use App\Http\Controllers\Admin\BillController;
+use App\Http\Controllers\Pharmacist\MedicineController as PharmacistMedicineController;
+use App\Http\Controllers\Cashier\BillController as CashierBillController;
 use App\Http\Controllers\Patient\AppointmentController;
 use App\Http\Controllers\Patient\MedicalRecordController as PatientMedicalRecordController;
 use App\Http\Controllers\Patient\BillController as PatientBillController;
@@ -29,12 +29,18 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('schedules', ScheduleController::class);
-    Route::resource('medicines', MedicineController::class);
-    Route::resource('bills', BillController::class);
-    Route::post('bills/{bill}/pay', [BillController::class, 'pay'])->name('bills.pay');
     
     Route::get('bpjs', [\App\Http\Controllers\Admin\BpjsController::class, 'index'])->name('bpjs.index');
     Route::patch('bpjs/{patient}', [\App\Http\Controllers\Admin\BpjsController::class, 'update'])->name('bpjs.update');
+});
+
+Route::middleware(['auth', 'role:cashier'])->prefix('cashier')->name('cashier.')->group(function () {
+    Route::resource('bills', CashierBillController::class);
+    Route::post('bills/{bill}/pay', [CashierBillController::class, 'pay'])->name('bills.pay');
+});
+
+Route::middleware(['auth', 'role:pharmacist'])->prefix('pharmacist')->name('pharmacist.')->group(function () {
+    Route::resource('medicines', PharmacistMedicineController::class);
 });
 
 Route::middleware(['auth', 'role:patient'])->prefix('patient')->name('patient.')->group(function () {

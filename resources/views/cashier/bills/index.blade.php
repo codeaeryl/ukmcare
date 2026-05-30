@@ -5,7 +5,7 @@
     <div>
         <h2 class="text-2xl font-semibold text-gray-800">Billing Management</h2>
     </div>
-    <a href="{{ route('admin.bills.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-colors">
+    <a href="{{ route('cashier.bills.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-colors">
         Generate New Bill
     </a>
 </div>
@@ -35,7 +35,7 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 flex justify-end gap-2">
-                            <a href="{{ route('admin.bills.show', $bill->id) }}" class="px-2 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded text-xs font-medium transition-colors">View Detail</a>
+                            <a href="{{ route('cashier.bills.show', $bill->id) }}" class="px-2 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded text-xs font-medium transition-colors">View Detail</a>
                         </td>
                     </tr>
                 @empty

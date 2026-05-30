@@ -51,5 +51,21 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
             ]);
         }
+
+        // Pharmacist
+        User::create([
+            'role' => Role::PHARMACIST,
+            'name' => 'Pharmacist',
+            'email' => 'pharmacist@example.com',
+            'password' => Hash::make('password'),
+        ]);
+
+        // Cashier
+        User::create([
+            'role' => Role::CASHIER,
+            'name' => 'Cashier',
+            'email' => 'cashier@example.com',
+            'password' => Hash::make('password'),
+        ]);
     }
 }

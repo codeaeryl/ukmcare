@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Schedule;
 use App\Models\Doctor;
-use App\Models\Log;
 use App\Enums\DayName;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Enum;
@@ -55,12 +54,6 @@ class ScheduleController extends Controller
 
         $schedule = Schedule::create($data);
 
-        Log::create([
-            'user_id' => auth()->id(),
-            'activity' => 'Added new schedule for Doctor ID ' . $schedule->doctor_id,
-            'date' => now(),
-        ]);
-
         return redirect()->route('admin.schedules.index')->with('success', 'Schedule created successfully.');
     }
 
@@ -98,14 +91,9 @@ class ScheduleController extends Controller
 
         $data = $request->all();
         $data['quota'] = $quota;
+        $data['status'] = 'pending';
 
         $schedule->update($data);
-
-        Log::create([
-            'user_id' => auth()->id(),
-            'activity' => 'Updated schedule for Doctor ID ' . $schedule->doctor_id,
-            'date' => now(),
-        ]);
 
         return redirect()->route('admin.schedules.index')->with('success', 'Schedule updated successfully.');
     }
@@ -114,12 +102,6 @@ class ScheduleController extends Controller
     {
         $doctorId = $schedule->doctor_id;
         $schedule->delete();
-
-        Log::create([
-            'user_id' => auth()->id(),
-            'activity' => 'Deleted schedule for Doctor ID ' . $doctorId,
-            'date' => now(),
-        ]);
         
         return redirect()->route('admin.schedules.index')->with('success', 'Schedule deleted successfully.');
     }

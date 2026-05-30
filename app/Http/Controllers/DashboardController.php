@@ -8,7 +8,6 @@ use App\Models\Patient;
 use App\Models\Doctor;
 use App\Models\Registration;
 use App\Models\Payment;
-use App\Models\Log;
 
 class DashboardController extends Controller
 {
@@ -22,7 +21,6 @@ class DashboardController extends Controller
             $totalAppointments = Registration::count();
             $totalRevenue = Payment::sum('paid_amount');
 
-            $recentActivities = Log::with('user')->latest()->take(5)->get();
             $upcomingVisits = Registration::with('patient', 'schedule.doctor')
                 ->where('status', 'registered')
                 ->whereDate('registration_date', '>=', now())
@@ -30,7 +28,7 @@ class DashboardController extends Controller
                 ->take(5)
                 ->get();
 
-            return view('dashboard', compact('totalPatients', 'totalDoctors', 'totalAppointments', 'totalRevenue', 'recentActivities', 'upcomingVisits'));
+            return view('dashboard', compact('totalPatients', 'totalDoctors', 'totalAppointments', 'totalRevenue', 'upcomingVisits'));
         } elseif ($user->role->value === 'patient') {
             $patient = $user->patient;
             if (!$patient) {

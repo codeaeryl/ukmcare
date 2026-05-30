@@ -29,6 +29,7 @@
                     <th class="px-6 py-3 font-medium">Day</th>
                     <th class="px-6 py-3 font-medium">Time</th>
                     <th class="px-6 py-3 font-medium">Quota</th>
+                    <th class="px-6 py-3 font-medium">Status</th>
                     <th class="px-6 py-3 font-medium text-right">Actions</th>
                 </tr>
             </thead>
@@ -42,7 +43,17 @@
                         <td class="px-6 py-4 text-gray-600">{{ $schedule->schedule_day }}</td>
                         <td class="px-6 py-4 text-gray-600">{{ $schedule->start_hour }} - {{ $schedule->end_hour }}</td>
                         <td class="px-6 py-4 text-gray-600">{{ $schedule->quota }} patients</td>
+                        <td class="px-6 py-4">
+                            @if($schedule->status === 'pending')
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full">Pending</span>
+                            @elseif($schedule->status === 'accepted')
+                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">Accepted</span>
+                            @else
+                                <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full">Rejected</span>
+                            @endif
+                        </td>
                         <td class="px-6 py-4 flex justify-end gap-2">
+                            <a href="{{ route('admin.schedules.edit', $schedule->id) }}" class="px-2 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded text-xs font-medium transition-colors">Edit</a>
                             <form action="{{ route('admin.schedules.destroy', $schedule->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this schedule?');">
                                 @csrf
                                 @method('DELETE')
@@ -52,7 +63,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-8 text-center text-gray-500">No schedules found.</td>
+                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">No schedules found.</td>
                     </tr>
                 @endforelse
             </tbody>

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->time('start_hour');
             $table->time('end_hour');
             $table->integer('quota');
+            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
             $table->timestamps();
         });
     }

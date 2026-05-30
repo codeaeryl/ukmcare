@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Medicine;
-use App\Models\Log;
 use Illuminate\Http\Request;
 
 class MedicineController extends Controller
@@ -31,12 +30,6 @@ class MedicineController extends Controller
 
         $medicine = Medicine::create($request->all());
 
-        Log::create([
-            'user_id' => auth()->id(),
-            'activity' => 'Added new medicine: ' . $medicine->name,
-            'date' => now(),
-        ]);
-
         return redirect()->route('admin.medicines.index')->with('success', 'Medicine added successfully.');
     }
 
@@ -56,12 +49,6 @@ class MedicineController extends Controller
 
         $medicine->update($request->all());
 
-        Log::create([
-            'user_id' => auth()->id(),
-            'activity' => 'Updated medicine: ' . $medicine->name,
-            'date' => now(),
-        ]);
-
         return redirect()->route('admin.medicines.index')->with('success', 'Medicine updated successfully.');
     }
 
@@ -69,12 +56,6 @@ class MedicineController extends Controller
     {
         $name = $medicine->name;
         $medicine->delete();
-
-        Log::create([
-            'user_id' => auth()->id(),
-            'activity' => 'Deleted medicine: ' . $name,
-            'date' => now(),
-        ]);
         
         return redirect()->route('admin.medicines.index')->with('success', 'Medicine deleted successfully.');
     }

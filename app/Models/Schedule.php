@@ -14,6 +14,7 @@ class Schedule extends Model
         'start_hour',
         'end_hour',
         'quota',
+        'status',
     ];
 
     protected $casts = [

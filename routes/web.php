@@ -6,7 +6,6 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Admin\MedicineController;
 use App\Http\Controllers\Admin\BillController;
-use App\Http\Controllers\Admin\LogController;
 use App\Http\Controllers\Patient\AppointmentController;
 use App\Http\Controllers\Patient\MedicalRecordController as PatientMedicalRecordController;
 use App\Http\Controllers\Patient\BillController as PatientBillController;
@@ -33,7 +32,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('medicines', MedicineController::class);
     Route::resource('bills', BillController::class);
     Route::post('bills/{bill}/pay', [BillController::class, 'pay'])->name('bills.pay');
-    Route::get('logs', [LogController::class, 'index'])->name('logs.index');
     
     Route::get('bpjs', [\App\Http\Controllers\Admin\BpjsController::class, 'index'])->name('bpjs.index');
     Route::patch('bpjs/{patient}', [\App\Http\Controllers\Admin\BpjsController::class, 'update'])->name('bpjs.update');
@@ -52,7 +50,8 @@ Route::middleware(['auth', 'role:patient'])->prefix('patient')->name('patient.')
 });
 
 Route::middleware(['auth', 'role:doctor'])->prefix('doctor')->name('doctor.')->group(function () {
-    Route::resource('schedules', App\Http\Controllers\Doctor\ScheduleController::class);
+    Route::resource('schedules', App\Http\Controllers\Doctor\ScheduleController::class)->only(['index']);
+    Route::patch('schedules/{schedule}/verify', [App\Http\Controllers\Doctor\ScheduleController::class, 'verify'])->name('schedules.verify');
     Route::get('records/history', [MedicalRecordController::class, 'history'])->name('records.history');
     Route::get('records', [MedicalRecordController::class, 'index'])->name('records.index');
     Route::get('records/{registration}/create', [MedicalRecordController::class, 'create'])->name('records.create');

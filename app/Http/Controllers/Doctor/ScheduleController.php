@@ -11,13 +11,17 @@ class ScheduleController extends Controller
     public function index()
     {
         $doctor = auth()->user()->doctor;
+        if (!$doctor) {
+            return redirect()->route('dashboard')->with('error', 'Doctor profile not found. Please contact the administrator.');
+        }
         $schedules = Schedule::where('doctor_id', $doctor->id)->latest()->paginate(10);
         return view('doctor.schedules.index', compact('schedules'));
     }
 
     public function verify(Request $request, Schedule $schedule)
     {
-        if ($schedule->doctor_id !== auth()->user()->doctor->id) {
+        $doctor = auth()->user()->doctor;
+        if (!$doctor || $schedule->doctor_id !== $doctor->id) {
             abort(403);
         }
 

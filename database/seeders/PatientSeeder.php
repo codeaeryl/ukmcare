@@ -21,6 +21,8 @@ class PatientSeeder extends Seeder
         $genders = [Gender::MALE, Gender::FEMALE];
         $bloodTypes = ['A', 'B', 'AB', 'O'];
 
+        $bpjsStatuses = ['pending', 'unverified'];
+
         foreach ($users as $index => $user) {
             Patient::create([
                 'id' => 'MRN-2026' . str_pad($index + 1, 4, '0', STR_PAD_LEFT),
@@ -33,6 +35,7 @@ class PatientSeeder extends Seeder
                 'phone' => '0812345678' . $index,
                 'blood_type' => $bloodTypes[$index % count($bloodTypes)],
                 'bpjs_number' => '000123456789' . $index,
+                'bpjs_status' => $bpjsStatuses[$index % count($bpjsStatuses)],
                 'user_id' => $user->id,
             ]);
         }

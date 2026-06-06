@@ -8,12 +8,10 @@
         </h2>
         <p class="text-sm text-gray-500">View and manage your doctor visits.</p>
     </div>
-    @if (!$hasActiveAppointment)
     <a href="{{ route('patient.appointments.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-colors">
         <i data-lucide="plus" class="w-4 h-4"></i>
         Book Appointment
     </a>
-    @endif
 </div>
 
 @if (session('success'))

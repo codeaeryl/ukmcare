@@ -13,8 +13,8 @@ return new class extends Migration
         Schema::create('registrations', function (Blueprint $table) {
             $table->id();
             $table->string('patient_id', 20);
-            $table->foreign('patient_id')->references('id')->on('patients')->onDelete('cascade');
-            $table->foreignId('schedule_id')->constrained('schedules')->onDelete('cascade');
+            $table->foreign('patient_id')->references('id')->on('patients')->onDelete('restrict');
+            $table->foreignId('schedule_id')->constrained('schedules')->onDelete('restrict');
             $table->integer('queue_number');
             $table->string('time_slot', 20)->nullable();
             $table->enum('status', array_column(RegistrationStatus::cases(), 'value'));

@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('specialist', 50);
             $table->string('phone', 15)->nullable();
             $table->boolean('is_bpjs')->default(false);
-            $table->boolean('is_active')->default(true);
             
             // Adding user_id to link doctor to their user account
             $table->foreignId('user_id')->unique()->constrained('users')->onDelete('cascade');

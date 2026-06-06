@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Schedule;
 use App\Models\Doctor;
 use App\Enums\DayName;
+use App\Enums\UserStatus;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Enum;
 use Carbon\Carbon;
@@ -20,7 +21,7 @@ class ScheduleController extends Controller
 
     public function create()
     {
-        $doctors = Doctor::where('is_active', true)->get();
+        $doctors = Doctor::whereHas('user', fn($q) => $q->where('status', UserStatus::ACTIVE))->get();
         return view('admin.schedules.create', compact('doctors'));
     }
 
@@ -49,7 +50,7 @@ class ScheduleController extends Controller
         $end = Carbon::createFromFormat('H:i', $request->end_hour);
         $quota = intval($start->diffInMinutes($end) / 20);
 
-        $data = $request->all();
+        $data = $request->only(['doctor_id', 'schedule_day', 'start_hour', 'end_hour']);
         $data['quota'] = $quota;
 
         $schedule = Schedule::create($data);
@@ -59,7 +60,7 @@ class ScheduleController extends Controller
 
     public function edit(Schedule $schedule)
     {
-        $doctors = Doctor::where('is_active', true)->get();
+        $doctors = Doctor::whereHas('user', fn($q) => $q->where('status', UserStatus::ACTIVE))->get();
         return view('admin.schedules.edit', compact('schedule', 'doctors'));
     }
 
@@ -89,7 +90,7 @@ class ScheduleController extends Controller
         $end = Carbon::createFromFormat('H:i', $request->end_hour);
         $quota = intval($start->diffInMinutes($end) / 20);
 
-        $data = $request->all();
+        $data = $request->only(['doctor_id', 'schedule_day', 'start_hour', 'end_hour']);
         $data['quota'] = $quota;
         $data['status'] = 'pending';
 

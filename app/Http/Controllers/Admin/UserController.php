@@ -8,10 +8,12 @@ use App\Models\Patient;
 use App\Models\Doctor;
 use App\Enums\Role;
 use App\Enums\Gender;
+use App\Enums\UserStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules;
+use Illuminate\Validation\Rules\Enum;
 
 class UserController extends Controller
 {
@@ -34,7 +36,8 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'string'],
+            'role' => ['required', 'string', new Enum(Role::class)],
+            'status' => ['required', 'string', new Enum(UserStatus::class)],
         ]);
 
         if ($request->role === 'patient') {
@@ -56,7 +59,6 @@ class UserController extends Controller
                 'specialist' => ['required', 'string', 'max:50'],
                 'phone_doctor' => ['nullable', 'string', 'max:15'],
                 'is_bpjs' => ['boolean'],
-                'is_active' => ['boolean'],
             ]);
         }
 
@@ -66,12 +68,13 @@ class UserController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => Role::from($request->role),
+                'status' => UserStatus::from($request->status),
             ]);
 
             if ($request->role === 'patient') {
-                $latestPatient = Patient::orderBy('created_at', 'desc')->first();
+                $latestPatient = Patient::lockForUpdate()->orderBy('created_at', 'desc')->first();
                 $nextIdNumber = 1;
-                if ($latestPatient && preg_match('/-(\d+)/', $latestPatient->id, $matches)) {
+                if ($latestPatient && preg_match('/(\d+)$/', $latestPatient->id, $matches)) {
                     $nextIdNumber = intval($matches[1]) + 1;
                 }
                 $mrn = 'MRN-' . date('Y') . str_pad($nextIdNumber, 4, '0', STR_PAD_LEFT);
@@ -90,9 +93,9 @@ class UserController extends Controller
                     'bpjs_number' => $request->bpjs_number,
                 ]);
             } elseif ($request->role === 'doctor') {
-                $latestDoctor = Doctor::orderBy('created_at', 'desc')->first();
+                $latestDoctor = Doctor::lockForUpdate()->orderBy('created_at', 'desc')->first();
                 $nextIdNumber = 1;
-                if ($latestDoctor && preg_match('/-(\d+)/', $latestDoctor->id, $matches)) {
+                if ($latestDoctor && preg_match('/(\d+)$/', $latestDoctor->id, $matches)) {
                     $nextIdNumber = intval($matches[1]) + 1;
                 }
                 $docId = 'DOC-' . str_pad($nextIdNumber, 4, '0', STR_PAD_LEFT);
@@ -107,7 +110,6 @@ class UserController extends Controller
                     'specialist' => $request->specialist,
                     'phone' => $request->phone_doctor,
                     'is_bpjs' => $request->has('is_bpjs'),
-                    'is_active' => $request->has('is_active'),
                 ]);
             }
         });
@@ -134,19 +136,39 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         
         $request->validate([
-            'role' => ['required', 'string'],
+            'role' => ['required', 'string', new Enum(Role::class)],
+            'status' => ['required', 'string', new Enum(UserStatus::class)],
         ]);
 
+        if ($user->id === auth()->id()) {
+            if ($user->role->value !== $request->role) {
+                return back()->with('error', 'You cannot change your own role.');
+            }
+            if ($request->status === UserStatus::INACTIVE->value) {
+                return back()->with('error', 'You cannot deactivate your own account.');
+            }
+        }
+
         $user->role = Role::from($request->role);
+        $user->status = UserStatus::from($request->status);
         $user->save();
 
-        return redirect()->route('admin.users.index')->with('success', 'User role updated successfully.');
+        return redirect()->route('admin.users.index')->with('success', 'User account updated successfully.');
     }
 
     public function destroy($id)
     {
         $user = User::findOrFail($id);
-        $user->delete();
+
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'You cannot delete your own account.');
+        }
+
+        try {
+            $user->delete();
+        } catch (\Illuminate\Database\QueryException $e) {
+            return back()->with('error', 'This user cannot be deleted because they have associated records (schedules, registrations, medical records, or bills) in the system. Consider deactivating their account instead.');
+        }
 
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
     }

@@ -39,6 +39,10 @@ class BillController extends Controller
 
         $registration = Registration::with('medicalRecord.prescriptions.medicine')->findOrFail($request->registration_id);
 
+        if (!$registration->medicalRecord) {
+            return back()->with('error', 'Cannot generate bill: no medical record found for this registration.');
+        }
+
         DB::transaction(function () use ($registration) {
             $bill = Bill::create([
                 'registration_id' => $registration->id,
@@ -90,12 +94,31 @@ class BillController extends Controller
             return back()->with('error', 'Bill is already paid.');
         }
 
+        $bill->load(['billMedicines', 'billServices']);
+
+        $totalMedicines = $bill->billMedicines->sum(function($item) {
+            return $item->quantity * $item->price;
+        });
+        
+        $totalServices = $bill->billServices->sum(function($item) {
+            return $item->quantity * $item->price;
+        });
+        
+        $grandTotal = $totalMedicines + $totalServices;
+
         $request->validate([
             'payment_method' => 'required|string',
-            'amount_paid' => 'required|numeric|min:0',
+            'amount_paid' => 'required|numeric|min:' . $grandTotal,
         ]);
 
         DB::transaction(function () use ($request, $bill) {
+            // Re-fetch with pessimistic lock to prevent double payment
+            $bill = Bill::lockForUpdate()->findOrFail($bill->id);
+
+            if ($bill->status === BillStatus::COMPLETE) {
+                throw new \RuntimeException('Bill is already paid.');
+            }
+
             Payment::create([
                 'bill_id' => $bill->id,
                 'payment_date' => now(),

@@ -63,16 +63,7 @@ class MedicalRecordController extends Controller
             'medicines.*.quantity' => 'integer|min:1',
         ]);
 
-        if ($request->filled('medicines')) {
-            foreach ($request->medicines as $med) {
-                if (isset($med['id']) && isset($med['quantity'])) {
-                    $medicine = Medicine::find($med['id']);
-                    if ($medicine->stock < $med['quantity']) {
-                        return back()->withErrors(['medicines' => "Not enough stock for {$medicine->name}. Available: {$medicine->stock}."])->withInput();
-                    }
-                }
-            }
-        }
+        // Stock validation is now done atomically inside the transaction below
 
         DB::transaction(function () use ($request, $registration) {
             $record = MedicalRecord::create([
@@ -94,8 +85,15 @@ class MedicalRecordController extends Controller
                             'dosage' => $med['instruction'] ?? '3x1 after meal',
                         ]);
 
-                        $medicine = Medicine::find($med['id']);
-                        $medicine->decrement('stock', $med['quantity']);
+                        // Atomic stock decrement with guard against negative stock
+                        $affected = Medicine::where('id', $med['id'])
+                            ->where('stock', '>=', $med['quantity'])
+                            ->decrement('stock', $med['quantity']);
+
+                        if ($affected === 0) {
+                            $medicine = Medicine::find($med['id']);
+                            throw new \RuntimeException("Not enough stock for {$medicine->name}. Available: {$medicine->stock}.");
+                        }
                     }
                 }
             }
@@ -142,6 +140,9 @@ class MedicalRecordController extends Controller
     public function history()
     {
         $doctor = auth()->user()->doctor;
+        if (!$doctor) {
+            return redirect()->route('dashboard')->with('error', 'Doctor profile not found. Please contact the administrator.');
+        }
         $records = MedicalRecord::with(['registration.patient'])
             ->where('doctor_id', $doctor->id)
             ->latest()
@@ -152,7 +153,8 @@ class MedicalRecordController extends Controller
 
     public function show(MedicalRecord $record)
     {
-        if ($record->doctor_id !== auth()->user()->doctor->id) {
+        $doctor = auth()->user()->doctor;
+        if (!$doctor || $record->doctor_id !== $doctor->id) {
             abort(403);
         }
 

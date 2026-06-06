@@ -12,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('bills', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('registration_id')->constrained('registrations')->onDelete('cascade');
+            $table->foreignId('registration_id')->constrained('registrations')->onDelete('restrict');
             $table->dateTime('date');
             $table->enum('status', array_column(BillStatus::cases(), 'value'));
             $table->timestamps();

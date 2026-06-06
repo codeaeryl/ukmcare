@@ -29,7 +29,6 @@ class DoctorSeeder extends Seeder
                 'specialist' => $specialists[$index % count($specialists)],
                 'phone' => '0812345678' . (9 - $index),
                 'is_bpjs' => ($index % 2 == 0), // Alternates true and false
-                'is_active' => true,
                 'user_id' => $user->id,
             ]);
         }

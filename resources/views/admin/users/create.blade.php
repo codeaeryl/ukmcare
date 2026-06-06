@@ -48,6 +48,16 @@
                 </select>
                 @error('role') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
+
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Status <span class="text-red-500">*</span></label>
+                <select name="status" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    @foreach(\App\Enums\UserStatus::cases() as $status)
+                        <option value="{{ $status->value }}" {{ old('status', 'active') == $status->value ? 'selected' : '' }}>{{ ucfirst($status->value) }}</option>
+                    @endforeach
+                </select>
+                @error('status') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
         </div>
 
         <div id="patient-fields" style="display: none;">
@@ -138,10 +148,6 @@
                     <label class="flex items-center">
                         <input type="checkbox" name="is_bpjs" value="1" {{ old('is_bpjs') ? 'checked' : '' }} class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         <span class="ml-2 text-sm text-gray-700">BPJS Provider</span>
-                    </label>
-                    <label class="flex items-center">
-                        <input type="checkbox" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }} class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <span class="ml-2 text-sm text-gray-700">Active</span>
                     </label>
                 </div>
             </div>

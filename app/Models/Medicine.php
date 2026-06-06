@@ -10,6 +10,7 @@ class Medicine extends Model
         'name',
         'stock',
         'price',
+        'unit',
     ];
 
     public function prescriptions()

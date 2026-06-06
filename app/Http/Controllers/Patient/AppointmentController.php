@@ -7,6 +7,8 @@ use App\Models\Registration;
 use App\Models\Schedule;
 use App\Models\Doctor;
 use App\Enums\RegistrationStatus;
+use App\Enums\DoctorStatus;
+use App\Enums\UserStatus;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -81,15 +83,7 @@ class AppointmentController extends Controller
             return redirect()->route('dashboard')->with('error', 'Please complete your patient profile first.');
         }
 
-        $hasActiveAppointment = Registration::where('patient_id', $patient->id)
-            ->where('status', RegistrationStatus::REGISTERED)
-            ->exists();
-
-        if ($hasActiveAppointment) {
-            return redirect()->route('patient.appointments.index')->with('error', 'You already have an active appointment registration.');
-        }
-
-        $doctors = Doctor::where('is_active', true)->with('schedules')->get();
+        $doctors = Doctor::whereHas('user', fn($q) => $q->where('status', UserStatus::ACTIVE))->with('schedules')->get();
         return view('patient.appointments.create', compact('doctors'));
     }
 
@@ -100,19 +94,22 @@ class AppointmentController extends Controller
             return redirect()->route('dashboard')->with('error', 'Please complete your patient profile first.');
         }
 
-        $hasActiveAppointment = Registration::where('patient_id', $patient->id)
-            ->where('status', RegistrationStatus::REGISTERED)
-            ->exists();
-
-        if ($hasActiveAppointment) {
-            return redirect()->route('patient.appointments.index')->with('error', 'You already have an active appointment registration.');
-        }
-
         $request->validate([
             'schedule_id' => 'required|exists:schedules,id',
             'registration_date' => 'required|date|after_or_equal:today',
             'time_slot' => 'required|string',
         ]);
+
+        // Check if patient already has an appointment at this exact date and time slot
+        $hasDuplicate = Registration::where('patient_id', $patient->id)
+            ->whereDate('registration_date', $request->registration_date)
+            ->where('time_slot', $request->time_slot)
+            ->where('status', '!=', RegistrationStatus::CANCELLED)
+            ->exists();
+
+        if ($hasDuplicate) {
+            return back()->with('error', 'You already have another appointment scheduled at this exact date and time slot. Please choose a different time slot.');
+        }
 
         $schedule = Schedule::findOrFail($request->schedule_id);
 
@@ -159,6 +156,18 @@ class AppointmentController extends Controller
         }
         $queueNumber += 1;
 
+        // Check if selected time slot has already passed for today
+        $selectedDate = Carbon::parse($request->registration_date);
+        if ($selectedDate->isToday()) {
+            $slotStartStr = explode(' - ', $request->time_slot)[0] ?? null;
+            if ($slotStartStr) {
+                $slotStart = Carbon::parse($request->registration_date . ' ' . $slotStartStr);
+                if ($slotStart->isPast()) {
+                    return back()->with('error', 'The selected time slot has already passed for today.');
+                }
+            }
+        }
+
         Registration::create([
             'patient_id' => $patient->id,
             'schedule_id' => $schedule->id,
@@ -180,6 +189,15 @@ class AppointmentController extends Controller
 
         if ($appointment->status !== RegistrationStatus::REGISTERED) {
             return back()->with('error', 'Only registered appointments can be cancelled.');
+        }
+
+        // Prevent cancelling past appointments
+        $appointmentStartStr = explode(' - ', $appointment->time_slot)[0] ?? null;
+        if ($appointmentStartStr) {
+            $appointmentStart = Carbon::parse($appointment->registration_date->format('Y-m-d') . ' ' . $appointmentStartStr);
+            if ($appointmentStart->isPast()) {
+                return back()->with('error', 'You cannot cancel an appointment that has already started or passed.');
+            }
         }
 
         $appointment->update(['status' => RegistrationStatus::CANCELLED]);

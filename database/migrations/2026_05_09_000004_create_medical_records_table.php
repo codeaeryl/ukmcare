@@ -10,9 +10,9 @@ return new class extends Migration
     {
         Schema::create('medical_records', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('registration_id')->constrained('registrations')->onDelete('cascade');
+            $table->foreignId('registration_id')->constrained('registrations')->onDelete('restrict');
             $table->string('doctor_id', 20);
-            $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
+            $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('restrict');
             $table->string('diagnosis')->nullable();
             $table->text('description')->nullable();
             $table->text('action')->nullable();

@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('bill_medicines', function (Blueprint $table) {
             $table->id();
             $table->foreignId('bill_id')->constrained('bills')->onDelete('cascade');
-            $table->foreignId('medicine_id')->constrained('medicines')->onDelete('cascade');
+            $table->foreignId('medicine_id')->constrained('medicines')->onDelete('restrict');
             $table->integer('quantity');
             $table->decimal('price', 12, 2);
             $table->timestamps();

@@ -28,6 +28,7 @@
                     <th class="px-6 py-3 font-medium">Name</th>
                     <th class="px-6 py-3 font-medium">Email</th>
                     <th class="px-6 py-3 font-medium">Role</th>
+                    <th class="px-6 py-3 font-medium">Status</th>
                     <th class="px-6 py-3 font-medium">Associated Profile</th>
                     <th class="px-6 py-3 font-medium text-right">Actions</th>
                 </tr>
@@ -44,6 +45,13 @@
                                 {{ $user->role->value === 'patient' ? 'bg-green-100 text-green-700' : '' }}
                             ">
                                 {{ ucfirst($user->role->value) }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 rounded text-xs font-medium 
+                                {{ $user->status->value === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}
+                            ">
+                                {{ ucfirst($user->status->value) }}
                             </span>
                         </td>
                         <td class="px-6 py-4 text-gray-600">
@@ -69,7 +77,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-8 text-center text-gray-500">No users found.</td>
+                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">No users found.</td>
                     </tr>
                 @endforelse
             </tbody>

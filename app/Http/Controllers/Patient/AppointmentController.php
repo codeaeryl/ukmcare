@@ -7,6 +7,8 @@ use App\Models\Registration;
 use App\Models\Schedule;
 use App\Models\Doctor;
 use App\Enums\RegistrationStatus;
+use App\Enums\DoctorStatus;
+use App\Enums\UserStatus;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -81,7 +83,7 @@ class AppointmentController extends Controller
             return redirect()->route('dashboard')->with('error', 'Please complete your patient profile first.');
         }
 
-        $doctors = Doctor::where('is_active', true)->with('schedules')->get();
+        $doctors = Doctor::whereHas('user', fn($q) => $q->where('status', UserStatus::ACTIVE))->with('schedules')->get();
         return view('patient.appointments.create', compact('doctors'));
     }
 
@@ -154,6 +156,18 @@ class AppointmentController extends Controller
         }
         $queueNumber += 1;
 
+        // Check if selected time slot has already passed for today
+        $selectedDate = Carbon::parse($request->registration_date);
+        if ($selectedDate->isToday()) {
+            $slotStartStr = explode(' - ', $request->time_slot)[0] ?? null;
+            if ($slotStartStr) {
+                $slotStart = Carbon::parse($request->registration_date . ' ' . $slotStartStr);
+                if ($slotStart->isPast()) {
+                    return back()->with('error', 'The selected time slot has already passed for today.');
+                }
+            }
+        }
+
         Registration::create([
             'patient_id' => $patient->id,
             'schedule_id' => $schedule->id,
@@ -175,6 +189,15 @@ class AppointmentController extends Controller
 
         if ($appointment->status !== RegistrationStatus::REGISTERED) {
             return back()->with('error', 'Only registered appointments can be cancelled.');
+        }
+
+        // Prevent cancelling past appointments
+        $appointmentStartStr = explode(' - ', $appointment->time_slot)[0] ?? null;
+        if ($appointmentStartStr) {
+            $appointmentStart = Carbon::parse($appointment->registration_date->format('Y-m-d') . ' ' . $appointmentStartStr);
+            if ($appointmentStart->isPast()) {
+                return back()->with('error', 'You cannot cancel an appointment that has already started or passed.');
+            }
         }
 
         $appointment->update(['status' => RegistrationStatus::CANCELLED]);

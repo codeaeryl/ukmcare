@@ -8,6 +8,7 @@ use App\Models\Patient;
 use App\Models\Doctor;
 use App\Enums\Role;
 use App\Enums\Gender;
+use App\Enums\UserStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -36,6 +37,7 @@ class UserController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'string', new Enum(Role::class)],
+            'status' => ['required', 'string', new Enum(UserStatus::class)],
         ]);
 
         if ($request->role === 'patient') {
@@ -57,7 +59,6 @@ class UserController extends Controller
                 'specialist' => ['required', 'string', 'max:50'],
                 'phone_doctor' => ['nullable', 'string', 'max:15'],
                 'is_bpjs' => ['boolean'],
-                'is_active' => ['boolean'],
             ]);
         }
 
@@ -67,6 +68,7 @@ class UserController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => Role::from($request->role),
+                'status' => UserStatus::from($request->status),
             ]);
 
             if ($request->role === 'patient') {
@@ -108,7 +110,6 @@ class UserController extends Controller
                     'specialist' => $request->specialist,
                     'phone' => $request->phone_doctor,
                     'is_bpjs' => $request->has('is_bpjs'),
-                    'is_active' => $request->has('is_active'),
                 ]);
             }
         });
@@ -136,16 +137,23 @@ class UserController extends Controller
         
         $request->validate([
             'role' => ['required', 'string', new Enum(Role::class)],
+            'status' => ['required', 'string', new Enum(UserStatus::class)],
         ]);
 
         if ($user->id === auth()->id()) {
-            return back()->with('error', 'You cannot change your own role.');
+            if ($user->role->value !== $request->role) {
+                return back()->with('error', 'You cannot change your own role.');
+            }
+            if ($request->status === UserStatus::INACTIVE->value) {
+                return back()->with('error', 'You cannot deactivate your own account.');
+            }
         }
 
         $user->role = Role::from($request->role);
+        $user->status = UserStatus::from($request->status);
         $user->save();
 
-        return redirect()->route('admin.users.index')->with('success', 'User role updated successfully.');
+        return redirect()->route('admin.users.index')->with('success', 'User account updated successfully.');
     }
 
     public function destroy($id)
@@ -156,7 +164,11 @@ class UserController extends Controller
             return back()->with('error', 'You cannot delete your own account.');
         }
 
-        $user->delete();
+        try {
+            $user->delete();
+        } catch (\Illuminate\Database\QueryException $e) {
+            return back()->with('error', 'This user cannot be deleted because they have associated records (schedules, registrations, medical records, or bills) in the system. Consider deactivating their account instead.');
+        }
 
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
     }

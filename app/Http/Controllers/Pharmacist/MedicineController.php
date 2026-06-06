@@ -54,8 +54,11 @@ class MedicineController extends Controller
 
     public function destroy(Medicine $medicine)
     {
-        $name = $medicine->name;
-        $medicine->delete();
+        try {
+            $medicine->delete();
+        } catch (\Illuminate\Database\QueryException $e) {
+            return back()->with('error', "The medicine '{$medicine->name}' cannot be deleted because it is already linked to existing prescriptions or bill records. Consider setting its stock to 0 instead.");
+        }
         
         return redirect()->route('pharmacist.medicines.index')->with('success', 'Medicine deleted successfully.');
     }

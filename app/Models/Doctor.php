@@ -19,13 +19,11 @@ class Doctor extends Model
         'specialist',
         'phone',
         'is_bpjs',
-        'is_active',
         'user_id',
     ];
 
     protected $casts = [
         'is_bpjs' => 'boolean',
-        'is_active' => 'boolean',
     ];
 
     public function user(): BelongsTo

@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules;
+use Illuminate\Validation\Rules\Enum;
 
 class UserController extends Controller
 {
@@ -34,7 +35,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'string'],
+            'role' => ['required', 'string', new Enum(Role::class)],
         ]);
 
         if ($request->role === 'patient') {
@@ -69,9 +70,9 @@ class UserController extends Controller
             ]);
 
             if ($request->role === 'patient') {
-                $latestPatient = Patient::orderBy('created_at', 'desc')->first();
+                $latestPatient = Patient::lockForUpdate()->orderBy('created_at', 'desc')->first();
                 $nextIdNumber = 1;
-                if ($latestPatient && preg_match('/-(\d+)/', $latestPatient->id, $matches)) {
+                if ($latestPatient && preg_match('/(\d+)$/', $latestPatient->id, $matches)) {
                     $nextIdNumber = intval($matches[1]) + 1;
                 }
                 $mrn = 'MRN-' . date('Y') . str_pad($nextIdNumber, 4, '0', STR_PAD_LEFT);
@@ -90,9 +91,9 @@ class UserController extends Controller
                     'bpjs_number' => $request->bpjs_number,
                 ]);
             } elseif ($request->role === 'doctor') {
-                $latestDoctor = Doctor::orderBy('created_at', 'desc')->first();
+                $latestDoctor = Doctor::lockForUpdate()->orderBy('created_at', 'desc')->first();
                 $nextIdNumber = 1;
-                if ($latestDoctor && preg_match('/-(\d+)/', $latestDoctor->id, $matches)) {
+                if ($latestDoctor && preg_match('/(\d+)$/', $latestDoctor->id, $matches)) {
                     $nextIdNumber = intval($matches[1]) + 1;
                 }
                 $docId = 'DOC-' . str_pad($nextIdNumber, 4, '0', STR_PAD_LEFT);
@@ -134,8 +135,12 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         
         $request->validate([
-            'role' => ['required', 'string'],
+            'role' => ['required', 'string', new Enum(Role::class)],
         ]);
+
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'You cannot change your own role.');
+        }
 
         $user->role = Role::from($request->role);
         $user->save();
@@ -146,6 +151,11 @@ class UserController extends Controller
     public function destroy($id)
     {
         $user = User::findOrFail($id);
+
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'You cannot delete your own account.');
+        }
+
         $user->delete();
 
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');

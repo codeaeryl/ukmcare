@@ -35,7 +35,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 });
 
 Route::middleware(['auth', 'role:cashier'])->prefix('cashier')->name('cashier.')->group(function () {
-    Route::resource('bills', CashierBillController::class);
+    Route::resource('bills', CashierBillController::class)->only(['index', 'create', 'store', 'show']);
     Route::post('bills/{bill}/pay', [CashierBillController::class, 'pay'])->name('bills.pay');
 });
 
@@ -45,7 +45,7 @@ Route::middleware(['auth', 'role:pharmacist'])->prefix('pharmacist')->name('phar
 
 Route::middleware(['auth', 'role:patient'])->prefix('patient')->name('patient.')->group(function () {
     Route::get('appointments/available-slots', [AppointmentController::class, 'availableSlots'])->name('appointments.available-slots');
-    Route::resource('appointments', AppointmentController::class);
+    Route::resource('appointments', AppointmentController::class)->only(['index', 'create', 'store']);
     Route::post('appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])->name('appointments.cancel');
 
     Route::get('records', [PatientMedicalRecordController::class, 'index'])->name('records.index');

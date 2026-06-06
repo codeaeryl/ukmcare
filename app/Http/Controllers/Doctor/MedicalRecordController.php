@@ -63,16 +63,7 @@ class MedicalRecordController extends Controller
             'medicines.*.quantity' => 'integer|min:1',
         ]);
 
-        if ($request->filled('medicines')) {
-            foreach ($request->medicines as $med) {
-                if (isset($med['id']) && isset($med['quantity'])) {
-                    $medicine = Medicine::find($med['id']);
-                    if ($medicine->stock < $med['quantity']) {
-                        return back()->withErrors(['medicines' => "Not enough stock for {$medicine->name}. Available: {$medicine->stock}."])->withInput();
-                    }
-                }
-            }
-        }
+        // Stock validation is now done atomically inside the transaction below
 
         DB::transaction(function () use ($request, $registration) {
             $record = MedicalRecord::create([
@@ -94,8 +85,15 @@ class MedicalRecordController extends Controller
                             'dosage' => $med['instruction'] ?? '3x1 after meal',
                         ]);
 
-                        $medicine = Medicine::find($med['id']);
-                        $medicine->decrement('stock', $med['quantity']);
+                        // Atomic stock decrement with guard against negative stock
+                        $affected = Medicine::where('id', $med['id'])
+                            ->where('stock', '>=', $med['quantity'])
+                            ->decrement('stock', $med['quantity']);
+
+                        if ($affected === 0) {
+                            $medicine = Medicine::find($med['id']);
+                            throw new \RuntimeException("Not enough stock for {$medicine->name}. Available: {$medicine->stock}.");
+                        }
                     }
                 }
             }

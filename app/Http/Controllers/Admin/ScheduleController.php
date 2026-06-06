@@ -49,7 +49,7 @@ class ScheduleController extends Controller
         $end = Carbon::createFromFormat('H:i', $request->end_hour);
         $quota = intval($start->diffInMinutes($end) / 20);
 
-        $data = $request->all();
+        $data = $request->only(['doctor_id', 'schedule_day', 'start_hour', 'end_hour']);
         $data['quota'] = $quota;
 
         $schedule = Schedule::create($data);
@@ -89,7 +89,7 @@ class ScheduleController extends Controller
         $end = Carbon::createFromFormat('H:i', $request->end_hour);
         $quota = intval($start->diffInMinutes($end) / 20);
 
-        $data = $request->all();
+        $data = $request->only(['doctor_id', 'schedule_day', 'start_hour', 'end_hour']);
         $data['quota'] = $quota;
         $data['status'] = 'pending';
 

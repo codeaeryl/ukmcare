@@ -28,7 +28,7 @@ class MedicineController extends Controller
             'unit' => 'required|string|max:20',
         ]);
 
-        $medicine = Medicine::create($request->all());
+        $medicine = Medicine::create($request->only(['name', 'stock', 'price', 'unit']));
 
         return redirect()->route('pharmacist.medicines.index')->with('success', 'Medicine added successfully.');
     }
@@ -47,7 +47,7 @@ class MedicineController extends Controller
             'unit' => 'required|string|max:20',
         ]);
 
-        $medicine->update($request->all());
+        $medicine->update($request->only(['name', 'stock', 'price', 'unit']));
 
         return redirect()->route('pharmacist.medicines.index')->with('success', 'Medicine updated successfully.');
     }

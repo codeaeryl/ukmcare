@@ -55,9 +55,9 @@ class RegisteredUserController extends Controller
                 'role' => Role::PATIENT,
             ]);
 
-            $latestPatient = Patient::orderBy('created_at', 'desc')->first();
+            $latestPatient = Patient::lockForUpdate()->orderBy('created_at', 'desc')->first();
             $nextIdNumber = 1;
-            if ($latestPatient && preg_match('/-(\d+)/', $latestPatient->id, $matches)) {
+            if ($latestPatient && preg_match('/(\d+)$/', $latestPatient->id, $matches)) {
                 $nextIdNumber = intval($matches[1]) + 1;
             }
             $mrn = 'MRN-' . date('Y') . str_pad($nextIdNumber, 4, '0', STR_PAD_LEFT);

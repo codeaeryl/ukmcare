@@ -90,9 +90,19 @@ class BillController extends Controller
             return back()->with('error', 'Bill is already paid.');
         }
 
+        $totalMedicines = $bill->billMedicines->sum(function($item) {
+            return $item->quantity * $item->price;
+        });
+        
+        $totalServices = $bill->billServices->sum(function($item) {
+            return $item->quantity * $item->price;
+        });
+        
+        $grandTotal = $totalMedicines + $totalServices;
+
         $request->validate([
             'payment_method' => 'required|string',
-            'amount_paid' => 'required|numeric|min:0',
+            'amount_paid' => 'required|numeric|min:' . $grandTotal,
         ]);
 
         DB::transaction(function () use ($request, $bill) {

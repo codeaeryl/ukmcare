@@ -81,14 +81,6 @@ class AppointmentController extends Controller
             return redirect()->route('dashboard')->with('error', 'Please complete your patient profile first.');
         }
 
-        $hasActiveAppointment = Registration::where('patient_id', $patient->id)
-            ->where('status', RegistrationStatus::REGISTERED)
-            ->exists();
-
-        if ($hasActiveAppointment) {
-            return redirect()->route('patient.appointments.index')->with('error', 'You already have an active appointment registration.');
-        }
-
         $doctors = Doctor::where('is_active', true)->with('schedules')->get();
         return view('patient.appointments.create', compact('doctors'));
     }
@@ -100,19 +92,22 @@ class AppointmentController extends Controller
             return redirect()->route('dashboard')->with('error', 'Please complete your patient profile first.');
         }
 
-        $hasActiveAppointment = Registration::where('patient_id', $patient->id)
-            ->where('status', RegistrationStatus::REGISTERED)
-            ->exists();
-
-        if ($hasActiveAppointment) {
-            return redirect()->route('patient.appointments.index')->with('error', 'You already have an active appointment registration.');
-        }
-
         $request->validate([
             'schedule_id' => 'required|exists:schedules,id',
             'registration_date' => 'required|date|after_or_equal:today',
             'time_slot' => 'required|string',
         ]);
+
+        // Check if patient already has an appointment at this exact date and time slot
+        $hasDuplicate = Registration::where('patient_id', $patient->id)
+            ->whereDate('registration_date', $request->registration_date)
+            ->where('time_slot', $request->time_slot)
+            ->where('status', '!=', RegistrationStatus::CANCELLED)
+            ->exists();
+
+        if ($hasDuplicate) {
+            return back()->with('error', 'You already have another appointment scheduled at this exact date and time slot. Please choose a different time slot.');
+        }
 
         $schedule = Schedule::findOrFail($request->schedule_id);
 

@@ -142,6 +142,9 @@ class MedicalRecordController extends Controller
     public function history()
     {
         $doctor = auth()->user()->doctor;
+        if (!$doctor) {
+            return redirect()->route('dashboard')->with('error', 'Doctor profile not found. Please contact the administrator.');
+        }
         $records = MedicalRecord::with(['registration.patient'])
             ->where('doctor_id', $doctor->id)
             ->latest()
@@ -152,7 +155,8 @@ class MedicalRecordController extends Controller
 
     public function show(MedicalRecord $record)
     {
-        if ($record->doctor_id !== auth()->user()->doctor->id) {
+        $doctor = auth()->user()->doctor;
+        if (!$doctor || $record->doctor_id !== $doctor->id) {
             abort(403);
         }
 

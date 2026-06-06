@@ -23,9 +23,20 @@ class RegistrationTest extends TestCase
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'nik' => '3201012345678901',
+            'dob' => '1995-05-15',
+            'gender' => 'male',
+            'bpjs_number' => '0009876543210',
         ]);
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
+
+        $this->assertDatabaseHas('patients', [
+            'nik' => '3201012345678901',
+            'full_name' => 'Test User',
+            'bpjs_number' => '0009876543210',
+            'bpjs_status' => 'pending',
+        ]);
     }
 }

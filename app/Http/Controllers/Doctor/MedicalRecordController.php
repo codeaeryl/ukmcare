@@ -65,7 +65,7 @@ class MedicalRecordController extends Controller
 
         // Stock validation is now done atomically inside the transaction below
 
-        DB::transaction(function () use ($request, $registration) {
+        DB::transaction(function () use ($request, $registration, $doctor) {
             $record = MedicalRecord::create([
                 'registration_id' => $registration->id,
                 'doctor_id' => $registration->schedule->doctor_id,
@@ -122,7 +122,10 @@ class MedicalRecordController extends Controller
                 }
             }
 
-            $service = Service::firstOrCreate(['name' => 'Consultation Fee'], ['price' => 50000]);
+            $service = Service::firstOrCreate(
+                ['name' => 'Consultation Fee', 'doctor_id' => $doctor->id],
+                ['price' => 50000]
+            );
             $bill->billServices()->firstOrCreate(
                 ['service_id' => $service->id],
                 [

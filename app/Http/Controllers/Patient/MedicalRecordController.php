@@ -16,7 +16,7 @@ class MedicalRecordController extends Controller
             return redirect()->route('dashboard')->with('error', 'Patient profile not found.');
         }
 
-        $records = MedicalRecord::with(['doctor', 'prescriptions.medicine', 'registration'])
+        $records = MedicalRecord::with(['doctor', 'prescriptions.medicine', 'registration.bill'])
             ->whereHas('registration', function ($query) use ($patient) {
                 $query->where('patient_id', $patient->id);
             })
@@ -35,10 +35,15 @@ class MedicalRecordController extends Controller
         }
 
         // Ensure the patient can only view their own records
-        $record->load(['doctor', 'prescriptions.medicine', 'registration.schedule']);
+        $record->load(['doctor', 'prescriptions.medicine', 'registration.schedule', 'registration.bill']);
 
         if ($record->registration->patient_id !== $patient->id) {
             abort(403, 'Unauthorized action.');
+        }
+
+        $bill = $record->registration->bill;
+        if ($bill && $bill->status->value !== 'complete') {
+            return redirect()->route('patient.records.index')->with('error', 'This medical record is on hold. Please complete the bill payment to view its details.');
         }
 
         return view('patient.records.show', compact('record'));

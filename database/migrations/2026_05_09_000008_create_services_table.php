@@ -11,9 +11,12 @@ return new class extends Migration
         Schema::create('services', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('doctor_id', 20)->nullable();
             $table->string('description')->nullable();
             $table->decimal('price', 12, 2);
             $table->timestamps();
+
+            $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('set null');
         });
     }
 

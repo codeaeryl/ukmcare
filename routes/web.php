@@ -37,6 +37,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 Route::middleware(['auth', 'role:cashier'])->prefix('cashier')->name('cashier.')->group(function () {
     Route::resource('bills', CashierBillController::class)->only(['index', 'create', 'store', 'show']);
     Route::post('bills/{bill}/pay', [CashierBillController::class, 'pay'])->name('bills.pay');
+    Route::resource('services', App\Http\Controllers\Cashier\ServiceController::class)->except(['show']);
 });
 
 Route::middleware(['auth', 'role:pharmacist'])->prefix('pharmacist')->name('pharmacist.')->group(function () {

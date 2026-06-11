@@ -60,7 +60,14 @@ class BillController extends Controller
                 }
             }
 
-            $service = Service::firstOrCreate(['name' => 'Consultation Fee'], ['price' => 50000]);
+            // Fetch the doctor from the registration schedule to apply the correct consultation fee
+            $registration->load('schedule');
+            $doctorId = $registration->schedule->doctor_id;
+
+            $service = Service::firstOrCreate(
+                ['name' => 'Consultation Fee', 'doctor_id' => $doctorId], 
+                ['price' => 50000]
+            );
             $bill->billServices()->create([
                 'service_id' => $service->id,
                 'quantity' => 1,

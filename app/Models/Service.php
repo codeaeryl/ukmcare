@@ -10,7 +10,13 @@ class Service extends Model
         'name',
         'description',
         'price',
+        'doctor_id',
     ];
+
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
+    }
 
     public function billServices()
     {

@@ -17,9 +17,16 @@ use Illuminate\Validation\Rules\Enum;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with(['patient', 'doctor'])->paginate(10);
+        $query = User::with(['patient', 'doctor']);
+
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
+        }
+
+        $users = $query->latest()->paginate(10)->withQueryString();
+        
         return view('admin.users.index', compact('users'));
     }
 

@@ -45,7 +45,6 @@ class PatientController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'nik' => ['required', 'string', 'size:16', 'unique:patients,nik'],
             'pob' => ['nullable', 'string', 'max:50'],
             'dob' => ['required', 'date'],
@@ -57,10 +56,12 @@ class PatientController extends Controller
         ]);
 
         DB::transaction(function () use ($request) {
+            $defaultPassword = str_replace('-', '', $request->dob); // YYYYMMDD
+
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
+                'password' => Hash::make($defaultPassword),
                 'role' => Role::PATIENT,
             ]);
 

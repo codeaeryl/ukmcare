@@ -31,17 +31,11 @@
                 <input type="email" name="email" value="{{ old('email') }}" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Password <span class="text-red-500">*</span></label>
-                <input type="password" name="password" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                @error('password') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password <span class="text-red-500">*</span></label>
-                <input type="password" name="password_confirmation" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
+        </div>
+
+        <div class="bg-blue-50 text-blue-800 p-3 rounded-lg mb-8 text-xs flex items-center gap-2">
+            <i data-lucide="info" class="w-4 h-4"></i>
+            <span>The default password for the patient's account will be set to their Date of Birth (format: YYYYMMDD).</span>
         </div>
 
         <h3 class="text-lg font-medium text-gray-800 mb-4 pb-2 border-b">Patient Identity</h3>

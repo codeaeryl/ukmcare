@@ -42,8 +42,6 @@ class ReceptionistTest extends TestCase
         $response = $this->actingAs($receptionist)->post(route('receptionist.patients.store'), [
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
             'nik' => '1234567890123456',
             'pob' => 'Jakarta',
             'dob' => '1995-05-15',
@@ -57,6 +55,9 @@ class ReceptionistTest extends TestCase
         $response->assertRedirect(route('receptionist.patients.index'));
         $this->assertDatabaseHas('users', ['email' => 'john.doe@example.com']);
         $this->assertDatabaseHas('patients', ['nik' => '1234567890123456']);
+
+        $user = User::where('email', 'john.doe@example.com')->first();
+        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('19950515', $user->password));
     }
 
     public function test_receptionist_can_schedule_walk_in_appointment()

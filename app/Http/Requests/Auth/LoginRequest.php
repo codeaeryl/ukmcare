@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
-use App\Enums\UserStatus;
 use App\Models\User;
 
 class LoginRequest extends FormRequest
@@ -45,12 +44,7 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $user = User::where('email', $this->email)->first();
-        if ($user && $user->status === UserStatus::INACTIVE) {
-            throw ValidationException::withMessages([
-                'email' => 'Your account has been deactivated.',
-            ]);
-        }
+
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());

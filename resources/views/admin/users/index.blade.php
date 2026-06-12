@@ -50,7 +50,6 @@
                 <tr>
                     <th class="px-6 py-4 font-medium">User Profile</th>
                     <th class="px-6 py-4 font-medium">Role</th>
-                    <th class="px-6 py-4 font-medium">Status</th>
                     <th class="px-6 py-4 font-medium">Associated ID</th>
                     <th class="px-6 py-4 font-medium text-right">Actions</th>
                 </tr>
@@ -85,14 +84,6 @@
                                     {{ $user->role->value === 'cashier' ? 'bg-teal-500' : '' }}
                                 "></span>
                                 {{ ucfirst($user->role->value) }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium 
-                                {{ $user->status->value === 'active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-rose-50 text-rose-700 border border-rose-100' }}
-                            ">
-                                <span class="w-1.5 h-1.5 rounded-full {{ $user->status->value === 'active' ? 'bg-emerald-500' : 'bg-rose-500' }}"></span>
-                                {{ ucfirst($user->status->value) }}
                             </span>
                         </td>
                         <td class="px-6 py-4 text-gray-600">
@@ -132,7 +123,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-12 text-center">
+                        <td colspan="4" class="px-6 py-12 text-center">
                             <div class="flex flex-col items-center justify-center text-gray-500">
                                 <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                                     <i data-lucide="users" class="w-8 h-8 text-gray-400"></i>

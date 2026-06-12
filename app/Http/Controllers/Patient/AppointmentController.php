@@ -8,7 +8,7 @@ use App\Models\Schedule;
 use App\Models\Doctor;
 use App\Enums\RegistrationStatus;
 use App\Enums\DoctorStatus;
-use App\Enums\UserStatus;
+
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -83,7 +83,7 @@ class AppointmentController extends Controller
             return redirect()->route('dashboard')->with('error', 'Please complete your patient profile first.');
         }
 
-        $doctors = Doctor::whereHas('user', fn($q) => $q->where('status', UserStatus::ACTIVE))->with('schedules')->get();
+        $doctors = Doctor::with('schedules')->get();
         return view('patient.appointments.create', compact('doctors'));
     }
 

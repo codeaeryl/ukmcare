@@ -44,16 +44,7 @@
                         </span>
                     </p>
                 </div>
-                <div>
-                    <p class="text-sm text-gray-500">Status</p>
-                    <p class="font-medium text-gray-800">
-                        <span class="px-2 py-1 rounded text-xs font-medium 
-                            {{ $user->status->value === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}
-                        ">
-                            {{ ucfirst($user->status->value) }}
-                        </span>
-                    </p>
-                </div>
+
                 <div>
                     <p class="text-sm text-gray-500">Registered At</p>
                     <p class="font-medium text-gray-800">{{ $user->created_at->format('d M Y H:i') }}</p>
@@ -126,14 +117,7 @@
                     <div><p class="text-sm text-gray-500">Phone</p><p class="font-medium text-gray-800">{{ $user->doctor->phone ?? '-' }}</p></div>
                     <div><p class="text-sm text-gray-500">SIP</p><p class="font-medium text-gray-800">{{ $user->doctor->sip }}</p></div>
                     <div><p class="text-sm text-gray-500">STR</p><p class="font-medium text-gray-800">{{ $user->doctor->str }}</p></div>
-                    <div>
-                        <p class="text-sm text-gray-500">Status</p>
-                        <p class="font-medium">
-                            <span class="px-2 py-1 text-xs rounded {{ $user->status->value === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
-                                {{ $user->status->value === 'active' ? 'Active' : 'Inactive' }}
-                            </span>
-                        </p>
-                    </div>
+
                     <div>
                         <p class="text-sm text-gray-500">BPJS Provider</p>
                         <p class="font-medium">

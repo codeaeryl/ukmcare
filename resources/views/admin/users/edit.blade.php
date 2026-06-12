@@ -49,23 +49,7 @@
                 @error('role') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
 
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Status <span class="text-red-500">*</span></label>
-                @if(auth()->id() === $user->id)
-                    <select disabled class="w-full bg-gray-100 cursor-not-allowed rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="{{ $user->status->value }}" selected>{{ ucfirst($user->status->value) }}</option>
-                    </select>
-                    <input type="hidden" name="status" value="{{ $user->status->value }}">
-                    <p class="text-xs text-gray-500 mt-1">You cannot change your own status.</p>
-                @else
-                    <select name="status" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        @foreach(\App\Enums\UserStatus::cases() as $status)
-                            <option value="{{ $status->value }}" {{ old('status', $user->status->value) == $status->value ? 'selected' : '' }}>{{ ucfirst($status->value) }}</option>
-                        @endforeach
-                    </select>
-                @endif
-                @error('status') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-            </div>
+
         </div>
 
         <div class="flex justify-end gap-3 pt-4 border-t">

@@ -9,4 +9,5 @@ enum Role: string
     case PATIENT = "patient";
     case PHARMACIST = "pharmacist";
     case CASHIER = "cashier";
+    case RECEPTIONIST = "receptionist";
 }

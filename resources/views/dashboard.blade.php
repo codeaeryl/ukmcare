@@ -13,12 +13,17 @@
             <i data-lucide="plus" class="w-4 h-4"></i>
             New User
         </a>
+        @elseif(auth()->user()->role->value === 'receptionist')
+        <a href="{{ route('receptionist.patients.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-colors">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            New Patient
+        </a>
         @endif
     </div>
 
-    @if(auth()->user()->role->value === 'admin')
+    @if(auth()->user()->role->value === 'admin' || auth()->user()->role->value === 'receptionist')
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 {{ auth()->user()->role->value === 'admin' ? 'xl:grid-cols-4' : 'xl:grid-cols-2' }} gap-6 mb-6">
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center gap-4">
             <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 flex-shrink-0">
                 <i data-lucide="users" class="w-6 h-6"></i>
@@ -39,6 +44,7 @@
             </div>
         </div>
         
+        @if(auth()->user()->role->value === 'admin')
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center gap-4">
             <div class="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-600 flex-shrink-0">
                 <i data-lucide="wallet" class="w-6 h-6"></i>
@@ -58,6 +64,7 @@
                 <h3 class="text-2xl font-bold text-gray-800">{{ $totalDoctors }}</h3>
             </div>
         </div>
+        @endif
     </div>
 
     <div class="grid grid-cols-1 gap-6">
@@ -65,7 +72,11 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
                 <h3 class="font-semibold text-gray-800">Upcoming Appointments</h3>
+                @if(auth()->user()->role->value === 'admin')
                 <a href="{{ route('admin.schedules.index') }}" class="text-sm text-blue-600 hover:underline">Manage</a>
+                @else
+                <a href="{{ route('receptionist.appointments.index') }}" class="text-sm text-blue-600 hover:underline">Manage</a>
+                @endif
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">

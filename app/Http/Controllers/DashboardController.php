@@ -52,6 +52,17 @@ class DashboardController extends Controller
         } elseif ($user->role->value === 'doctor') {
             // Placeholder for doctor dashboard
             return view('dashboard');
+        } elseif ($user->role->value === 'receptionist') {
+            $totalPatients = Patient::count();
+            $totalAppointments = Registration::count();
+            $upcomingVisits = Registration::with('patient', 'schedule.doctor')
+                ->where('status', 'registered')
+                ->whereDate('registration_date', '>=', now()->startOfDay())
+                ->orderBy('registration_date', 'asc')
+                ->take(5)
+                ->get();
+
+            return view('dashboard', compact('totalPatients', 'totalAppointments', 'upcomingVisits'));
         }
 
         return view('dashboard');

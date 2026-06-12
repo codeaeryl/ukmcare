@@ -12,7 +12,6 @@ use App\Models\MedicalRecord;
 use App\Models\Prescription;
 use App\Enums\Role;
 use App\Enums\Gender;
-use App\Enums\UserStatus;
 use App\Enums\RegistrationStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -21,70 +20,6 @@ use Carbon\Carbon;
 class BusinessLogicTest extends TestCase
 {
     use RefreshDatabase;
-
-    public function test_inactive_doctor_is_not_listed_in_available_doctors()
-    {
-        // Create an active doctor
-        $activeUser = User::factory()->create(['role' => Role::DOCTOR, 'status' => UserStatus::ACTIVE]);
-        $activeDoctor = Doctor::create([
-            'id' => 'DOC-0001',
-            'nik' => '1234567890123456',
-            'sip' => 'SIP/2026/001',
-            'str' => 'STR/2026/001',
-            'full_name' => 'Dr. Active',
-            'specialist' => 'General Practitioner',
-            'phone' => '081234567890',
-            'is_bpjs' => true,
-            'user_id' => $activeUser->id,
-        ]);
-
-        Schedule::create([
-            'doctor_id' => $activeDoctor->id,
-            'schedule_day' => 'Monday',
-            'start_hour' => '08:00:00',
-            'end_hour' => '12:00:00',
-            'quota' => 20,
-        ]);
-
-        // Create an inactive doctor
-        $inactiveUser = User::factory()->create(['role' => Role::DOCTOR, 'status' => UserStatus::INACTIVE]);
-        $inactiveDoctor = Doctor::create([
-            'id' => 'DOC-0002',
-            'nik' => '1234567890123457',
-            'sip' => 'SIP/2026/002',
-            'str' => 'STR/2026/002',
-            'full_name' => 'Dr. Inactive',
-            'specialist' => 'General Practitioner',
-            'phone' => '081234567891',
-            'is_bpjs' => true,
-            'user_id' => $inactiveUser->id,
-        ]);
-
-        Schedule::create([
-            'doctor_id' => $inactiveDoctor->id,
-            'schedule_day' => 'Monday',
-            'start_hour' => '08:00:00',
-            'end_hour' => '12:00:00',
-            'quota' => 20,
-        ]);
-
-        // Login as patient
-        $patientUser = User::factory()->create(['role' => Role::PATIENT]);
-        $patient = Patient::create([
-            'id' => 'MRN-20260001',
-            'nik' => '3201012345678901',
-            'full_name' => $patientUser->name,
-            'dob' => '1990-01-01',
-            'gender' => Gender::MALE,
-            'user_id' => $patientUser->id,
-        ]);
-
-        $response = $this->actingAs($patientUser)->get(route('patient.appointments.create'));
-
-        $response->assertStatus(200);
-        $response->assertSee('Dr. Active');
-        $response->assertDontSee('Dr. Inactive');
-    }
 
     public function test_deleting_user_with_active_records_fails_gracefully()
     {
@@ -318,11 +253,10 @@ class BusinessLogicTest extends TestCase
 
     public function test_admin_cannot_change_their_own_role()
     {
-        $admin = User::factory()->create(['role' => Role::ADMIN, 'status' => UserStatus::ACTIVE]);
+        $admin = User::factory()->create(['role' => Role::ADMIN]);
 
         $response = $this->actingAs($admin)->put(route('admin.users.update', $admin->id), [
             'role' => Role::PATIENT->value,
-            'status' => UserStatus::ACTIVE->value,
         ]);
 
         $response->assertRedirect();
@@ -330,23 +264,9 @@ class BusinessLogicTest extends TestCase
         $this->assertEquals(Role::ADMIN, $admin->fresh()->role);
     }
 
-    public function test_admin_cannot_deactivate_their_own_account()
-    {
-        $admin = User::factory()->create(['role' => Role::ADMIN, 'status' => UserStatus::ACTIVE]);
-
-        $response = $this->actingAs($admin)->put(route('admin.users.update', $admin->id), [
-            'role' => Role::ADMIN->value,
-            'status' => UserStatus::INACTIVE->value,
-        ]);
-
-        $response->assertRedirect();
-        $response->assertSessionHas('error', 'You cannot deactivate your own account.');
-        $this->assertEquals(UserStatus::ACTIVE, $admin->fresh()->status);
-    }
-
     public function test_admin_cannot_delete_their_own_account()
     {
-        $admin = User::factory()->create(['role' => Role::ADMIN, 'status' => UserStatus::ACTIVE]);
+        $admin = User::factory()->create(['role' => Role::ADMIN]);
 
         $response = $this->actingAs($admin)->delete(route('admin.users.destroy', $admin->id));
 

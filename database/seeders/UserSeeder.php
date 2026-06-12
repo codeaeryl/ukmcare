@@ -67,5 +67,13 @@ class UserSeeder extends Seeder
             'email' => 'cashier@example.com',
             'password' => Hash::make('password'),
         ]);
+
+        // Receptionist
+        User::create([
+            'role' => Role::RECEPTIONIST,
+            'name' => 'Receptionist',
+            'email' => 'receptionist@example.com',
+            'password' => Hash::make('password'),
+        ]);
     }
 }

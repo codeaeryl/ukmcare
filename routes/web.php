@@ -66,6 +66,11 @@ Route::middleware(['auth', 'role:doctor'])->prefix('doctor')->name('doctor.')->g
     Route::get('records/{record}/show', [MedicalRecordController::class, 'show'])->name('records.show');
 });
 
-
+Route::middleware(['auth', 'role:receptionist'])->prefix('receptionist')->name('receptionist.')->group(function () {
+    Route::resource('patients', App\Http\Controllers\Receptionist\PatientController::class);
+    Route::get('appointments/available-slots', [App\Http\Controllers\Receptionist\AppointmentController::class, 'availableSlots'])->name('appointments.available-slots');
+    Route::resource('appointments', App\Http\Controllers\Receptionist\AppointmentController::class)->only(['index', 'create', 'store']);
+    Route::post('appointments/{appointment}/cancel', [App\Http\Controllers\Receptionist\AppointmentController::class, 'cancel'])->name('appointments.cancel');
+});
 
 require __DIR__.'/auth.php';

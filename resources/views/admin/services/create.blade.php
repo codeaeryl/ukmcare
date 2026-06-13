@@ -3,7 +3,7 @@
 @section('content')
 <div class="max-w-3xl mx-auto">
     <div class="mb-6 flex items-center gap-4">
-        <a href="{{ route('cashier.services.index') }}" class="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500">
+        <a href="{{ route('admin.services.index') }}" class="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500">
             <i data-lucide="arrow-left" class="w-5 h-5"></i>
         </a>
         <div>
@@ -13,7 +13,7 @@
     </div>
 
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <form action="{{ route('cashier.services.store') }}" method="POST" class="p-6 md:p-8">
+        <form action="{{ route('admin.services.store') }}" method="POST" class="p-6 md:p-8">
             @csrf
 
             <div class="space-y-6">
@@ -68,7 +68,7 @@
             </div>
 
             <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-gray-100">
-                <a href="{{ route('cashier.services.index') }}" class="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors">
+                <a href="{{ route('admin.services.index') }}" class="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors">
                     Cancel
                 </a>
                 <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 shadow-sm transition-colors">

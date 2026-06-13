@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Cashier;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Service;
@@ -13,13 +13,13 @@ class ServiceController extends Controller
     public function index()
     {
         $services = Service::with('doctor')->latest()->paginate(10);
-        return view('cashier.services.index', compact('services'));
+        return view('admin.services.index', compact('services'));
     }
 
     public function create()
     {
         $doctors = Doctor::all();
-        return view('cashier.services.create', compact('doctors'));
+        return view('admin.services.create', compact('doctors'));
     }
 
     public function store(Request $request)
@@ -38,13 +38,13 @@ class ServiceController extends Controller
 
         Service::create($request->all());
 
-        return redirect()->route('cashier.services.index')->with('success', 'Service created successfully.');
+        return redirect()->route('admin.services.index')->with('success', 'Service created successfully.');
     }
 
     public function edit(Service $service)
     {
         $doctors = Doctor::all();
-        return view('cashier.services.edit', compact('service', 'doctors'));
+        return view('admin.services.edit', compact('service', 'doctors'));
     }
 
     public function update(Request $request, Service $service)
@@ -63,18 +63,18 @@ class ServiceController extends Controller
 
         $service->update($request->all());
 
-        return redirect()->route('cashier.services.index')->with('success', 'Service updated successfully.');
+        return redirect()->route('admin.services.index')->with('success', 'Service updated successfully.');
     }
 
     public function destroy(Service $service)
     {
         // Check if service is associated with any bills
         if ($service->billServices()->exists()) {
-            return redirect()->route('cashier.services.index')->with('error', 'Cannot delete service because it has been used in one or more bills.');
+            return redirect()->route('admin.services.index')->with('error', 'Cannot delete service because it has been used in one or more bills.');
         }
 
         $service->delete();
 
-        return redirect()->route('cashier.services.index')->with('success', 'Service deleted successfully.');
+        return redirect()->route('admin.services.index')->with('success', 'Service deleted successfully.');
     }
 }

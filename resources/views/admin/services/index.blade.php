@@ -10,7 +10,7 @@
     </div>
     
     <div class="flex items-center gap-3 w-full sm:w-auto">
-        <a href="{{ route('cashier.services.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center justify-center gap-2 shadow-sm transition-all hover:shadow-md whitespace-nowrap">
+        <a href="{{ route('admin.services.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center justify-center gap-2 shadow-sm transition-all hover:shadow-md whitespace-nowrap">
             <i data-lucide="plus" class="w-4 h-4"></i>
             Add Service
         </a>
@@ -67,10 +67,10 @@
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex justify-end gap-2">
-                                <a href="{{ route('cashier.services.edit', $service->id) }}" class="p-2 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors tooltip" title="Edit service">
+                                <a href="{{ route('admin.services.edit', $service->id) }}" class="p-2 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors tooltip" title="Edit service">
                                     <i data-lucide="edit-2" class="w-4 h-4"></i>
                                 </a>
-                                <form action="{{ route('cashier.services.destroy', $service->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this service?');">
+                                <form action="{{ route('admin.services.destroy', $service->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this service?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors tooltip" title="Delete service">
@@ -89,7 +89,7 @@
                                 </div>
                                 <p class="text-base font-medium text-gray-900 mb-1">No services found</p>
                                 <p class="text-sm">There are currently no services added to the system.</p>
-                                <a href="{{ route('cashier.services.create') }}" class="mt-4 text-blue-600 hover:text-blue-700 font-medium text-sm">Add a new service</a>
+                                <a href="{{ route('admin.services.create') }}" class="mt-4 text-blue-600 hover:text-blue-700 font-medium text-sm">Add a new service</a>
                             </div>
                         </td>
                     </tr>

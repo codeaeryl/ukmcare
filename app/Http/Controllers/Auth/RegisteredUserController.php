@@ -8,7 +8,7 @@ use App\Models\Patient;
 use App\Enums\Role;
 use App\Enums\Gender;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Auth\Events\Registered;
+
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,39 +47,9 @@ class RegisteredUserController extends Controller
             'bpjs_number' => ['nullable', 'string', 'max:20', 'unique:patients,bpjs_number'],
         ]);
 
-        $user = DB::transaction(function () use ($request) {
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'role' => Role::PATIENT,
-            ]);
+        $user = \App\Factories\UserFactory::make(Role::PATIENT)->createUser($request->all());
 
-            $latestPatient = Patient::lockForUpdate()->orderBy('created_at', 'desc')->first();
-            $nextIdNumber = 1;
-            if ($latestPatient && preg_match('/(\d+)$/', $latestPatient->id, $matches)) {
-                $nextIdNumber = intval($matches[1]) + 1;
-            }
-            $mrn = 'MRN-' . date('Y') . str_pad($nextIdNumber, 4, '0', STR_PAD_LEFT);
 
-            Patient::create([
-                'id' => $mrn,
-                'user_id' => $user->id,
-                'nik' => $request->nik,
-                'full_name' => $request->name,
-                'pob' => $request->pob,
-                'dob' => $request->dob,
-                'gender' => Gender::from($request->gender),
-                'address' => $request->address,
-                'phone' => $request->phone,
-                'bpjs_number' => $request->bpjs_number,
-                'bpjs_status' => $request->bpjs_number ? 'pending' : 'unverified',
-            ]);
-
-            return $user;
-        });
-
-        event(new Registered($user));
 
         Auth::login($user);
 

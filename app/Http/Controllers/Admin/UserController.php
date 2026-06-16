@@ -4,14 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Patient;
-use App\Models\Doctor;
 use App\Enums\Role;
 use App\Enums\Gender;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\Rules\Enum;
 
@@ -68,56 +64,7 @@ class UserController extends Controller
             ]);
         }
 
-        DB::transaction(function () use ($request) {
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'role' => Role::from($request->role),
-            ]);
-
-            if ($request->role === 'patient') {
-                $latestPatient = Patient::lockForUpdate()->orderBy('created_at', 'desc')->first();
-                $nextIdNumber = 1;
-                if ($latestPatient && preg_match('/(\d+)$/', $latestPatient->id, $matches)) {
-                    $nextIdNumber = intval($matches[1]) + 1;
-                }
-                $mrn = 'MRN-' . date('Y') . str_pad($nextIdNumber, 4, '0', STR_PAD_LEFT);
-
-                Patient::create([
-                    'id' => $mrn,
-                    'user_id' => $user->id,
-                    'nik' => $request->nik_patient,
-                    'full_name' => $request->name,
-                    'pob' => $request->pob,
-                    'dob' => $request->dob,
-                    'gender' => $request->gender,
-                    'address' => $request->address,
-                    'phone' => $request->phone_patient,
-                    'blood_type' => $request->blood_type,
-                    'bpjs_number' => $request->bpjs_number,
-                ]);
-            } elseif ($request->role === 'doctor') {
-                $latestDoctor = Doctor::lockForUpdate()->orderBy('created_at', 'desc')->first();
-                $nextIdNumber = 1;
-                if ($latestDoctor && preg_match('/(\d+)$/', $latestDoctor->id, $matches)) {
-                    $nextIdNumber = intval($matches[1]) + 1;
-                }
-                $docId = 'DOC-' . str_pad($nextIdNumber, 4, '0', STR_PAD_LEFT);
-
-                Doctor::create([
-                    'id' => $docId,
-                    'user_id' => $user->id,
-                    'nik' => $request->nik_doctor,
-                    'sip' => $request->sip,
-                    'str' => $request->str,
-                    'full_name' => $request->name,
-                    'specialist' => $request->specialist,
-                    'phone' => $request->phone_doctor,
-                    'is_bpjs' => $request->has('is_bpjs'),
-                ]);
-            }
-        });
+        $user = \App\Factories\UserFactory::make(Role::from($request->role))->createUser($request->all());
 
         return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
     }
